@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ARIA — AI Knowledge Assistant | Leadership Deck</title>
+<style>
+  :root{
+    --indigo:#6366f1;--purple:#8b5cf6;--violet:#7c3aed;
+    --emerald:#10b981;--cyan:#06b6d4;--rose:#f43f5e;
+    --amber:#f59e0b;--sky:#0ea5e9;
+    --dark:#0d0f17;--card:#161927;--card2:#1e2235;
+    --text:#e8eaf6;--muted:#8892b0;--white:#fff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--dark);font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);}
+
+  /* ── PARTICLES ──────────────────────────────────────────────────────────── */
+  #particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  .star{
+    position:absolute;border-radius:50%;
+    background:rgba(255,255,255,.7);
+    animation:twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s);
+  }
+  @keyframes twinkle{0%,100%{opacity:.15;transform:scale(1);}50%{opacity:.9;transform:scale(1.4);}}
+
+  /* ── DECK SHELL ─────────────────────────────────────────────────────────── */
+  .deck{width:100%;height:100%;position:relative;z-index:1;}
+  .slide{
+    position:absolute;inset:0;display:none;flex-direction:column;
+    justify-content:center;align-items:center;padding:48px 64px;
+  }
+  .slide.active{display:flex;}
+  .slide.entering { animation: slideIn .55s cubic-bezier(.16,1,.3,1) both; }
+  .slide.leaving  { animation: slideOut .35s ease-in both; }
+  @keyframes slideIn{from{opacity:0;transform:translateY(28px) scale(.97)}to{opacity:1;transform:none}}
+  @keyframes slideOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-20px) scale(.98)}}
+
+  /* stagger children */
+  .slide.entering > *:nth-child(1){animation:fadeUp .5s .05s both cubic-bezier(.16,1,.3,1);}
+  .slide.entering > *:nth-child(2){animation:fadeUp .5s .12s both cubic-bezier(.16,1,.3,1);}
+  .slide.entering > *:nth-child(3){animation:fadeUp .5s .19s both cubic-bezier(.16,1,.3,1);}
+  .slide.entering > *:nth-child(4){animation:fadeUp .5s .26s both cubic-bezier(.16,1,.3,1);}
+  .slide.entering > *:nth-child(5){animation:fadeUp .5s .33s both cubic-bezier(.16,1,.3,1);}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+  /* ── NAV ────────────────────────────────────────────────────────────────── */
+  .nav{
+    position:fixed;bottom:32px;left:50%;transform:translateX(-50%);
+    display:flex;gap:12px;align-items:center;z-index:100;
+    background:rgba(22,25,39,.9);backdrop-filter:blur(20px);
+    border:1px solid rgba(99,102,241,.3);border-radius:40px;padding:10px 20px;
+    box-shadow:0 8px 32px rgba(0,0,0,.4);
+  }
+  .nav button{
+    background:none;border:none;color:var(--muted);font-size:20px;
+    cursor:pointer;padding:4px 10px;border-radius:20px;transition:.2s;
+  }
+  .nav button:hover{color:var(--white);background:rgba(99,102,241,.25);transform:scale(1.1);}
+  .slide-counter{color:var(--muted);font-size:13px;min-width:48px;text-align:center;}
+  .progress{
+    position:fixed;top:0;left:0;height:3px;
+    background:linear-gradient(90deg,var(--indigo),var(--purple),var(--cyan),var(--emerald));
+    background-size:200% 100%;
+    transition:width .45s cubic-bezier(.16,1,.3,1);z-index:200;
+    animation:shimmerBar 3s linear infinite;
+    box-shadow:0 0 8px rgba(99,102,241,.6);
+  }
+  @keyframes shimmerBar{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .dot-nav{
+    position:fixed;right:24px;top:50%;transform:translateY(-50%);
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .dot{
+    width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.18);
+    cursor:pointer;transition:.25s;
+  }
+  .dot.active{background:var(--indigo);transform:scale(1.5);box-shadow:0 0 8px var(--indigo);}
+  .dot:hover:not(.active){background:rgba(99,102,241,.5);transform:scale(1.2);}
+
+  /* ── SHARED COMPONENTS ─────────────────────────────────────────────────── */
+  .tag{
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:1.5px;
+    text-transform:uppercase;padding:4px 12px;border-radius:20px;
+    background:rgba(99,102,241,.15);color:var(--indigo);border:1px solid rgba(99,102,241,.3);
+    margin-bottom:18px;
+    animation:pulse-tag 2.5s ease-in-out infinite;
+  }
+  @keyframes pulse-tag{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.3)}50%{box-shadow:0 0 0 6px rgba(99,102,241,0)}}
+  h1{font-size:clamp(36px,5vw,68px);font-weight:800;line-height:1.08;text-align:center;}
+  h2{font-size:clamp(26px,3.8vw,50px);font-weight:800;line-height:1.1;text-align:center;margin-bottom:12px;}
+  h3{font-size:20px;font-weight:700;margin-bottom:8px;}
+  .sub{font-size:clamp(14px,1.8vw,20px);color:var(--muted);text-align:center;max-width:760px;line-height:1.6;}
+  .grad{background:linear-gradient(135deg,var(--indigo),var(--purple),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .grad2{background:linear-gradient(135deg,var(--emerald),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .grad3{background:linear-gradient(135deg,var(--amber),var(--rose));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+  /* grid helpers */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:24px;width:100%;max-width:1100px;}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;width:100%;max-width:1100px;}
+  .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;width:100%;max-width:1100px;}
+
+  /* card */
+  .card{
+    background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:16px;
+    padding:24px;transition:.3s cubic-bezier(.16,1,.3,1);
+    position:relative;overflow:hidden;
+  }
+  .card::before{
+    content:'';position:absolute;inset:0;border-radius:16px;
+    background:linear-gradient(135deg,rgba(99,102,241,.06),transparent);
+    opacity:0;transition:.3s;
+  }
+  .card:hover::before{opacity:1;}
+  .card:hover{border-color:rgba(99,102,241,.5);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.3);}
+  .card p{color:var(--muted);font-size:14px;line-height:1.6;margin-top:6px;}
+  .icon{font-size:32px;margin-bottom:12px;}
+
+  /* stat card */
+  .stat{
+    background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:16px;
+    padding:28px 20px;text-align:center;
+    transition:.3s;
+  }
+  .stat:hover{transform:translateY(-3px);}
+  .stat-num{font-size:48px;font-weight:900;line-height:1;}
+  .stat-lbl{color:var(--muted);font-size:13px;margin-top:8px;}
+
+  /* pill list */
+  .pills{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:20px;}
+  .pill{
+    padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;
+    border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);
+    transition:.2s;
+  }
+  .pill:hover{background:rgba(255,255,255,.1);transform:translateY(-1px);}
+
+  /* ── SLIDE 1 — HERO ─────────────────────────────────────────────────────── */
+  #s1{background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(99,102,241,.22) 0%,transparent 70%),var(--dark);}
+  #s1 .orb{
+    width:180px;height:180px;border-radius:50%;margin-bottom:32px;
+    background:conic-gradient(from 0deg,var(--indigo),var(--purple),var(--cyan),var(--emerald),var(--indigo));
+    display:flex;align-items:center;justify-content:center;font-size:72px;
+    box-shadow:0 0 80px rgba(99,102,241,.5),0 0 120px rgba(99,102,241,.2);
+    animation:spin 8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  #s1 .orb-inner{
+    width:156px;height:156px;border-radius:50%;
+    background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:68px;
+    animation:spin 8s linear infinite reverse;
+  }
+  #s1 .byline{margin-top:28px;font-size:14px;color:var(--muted);}
+  #s1 .byline strong{color:var(--purple);}
+  .version-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);
+    color:var(--emerald);font-size:12px;font-weight:700;
+    padding:4px 14px;border-radius:20px;margin-top:14px;
+    animation:pulse-tag 2.5s ease-in-out infinite .5s;
+  }
+
+  /* ── SLIDE 2 — PROBLEM ──────────────────────────────────────────────────── */
+  #s2{background:var(--dark);}
+  .prob-item{
+    display:flex;align-items:flex-start;gap:16px;
+    background:var(--card);border:1px solid rgba(244,63,94,.15);border-radius:14px;
+    padding:20px;transition:.3s;
+  }
+  .prob-item:hover{border-color:rgba(244,63,94,.4);transform:translateY(-2px);}
+  .prob-icon{font-size:28px;flex-shrink:0;}
+  .prob-item h3{color:var(--rose);}
+  .prob-item p{color:var(--muted);font-size:14px;line-height:1.55;margin-top:4px;}
+
+  /* ── SLIDE 3 — SOLUTION ─────────────────────────────────────────────────── */
+  #s3{background:radial-gradient(ellipse 60% 50% at 80% 50%,rgba(16,185,129,.08) 0%,transparent 70%),var(--dark);}
+  .sol-hero{
+    background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(16,185,129,.08));
+    border:1px solid rgba(99,102,241,.2);border-radius:20px;
+    padding:28px 40px;max-width:880px;text-align:center;
+    box-shadow:0 0 60px rgba(99,102,241,.08);
+  }
+  .sol-hero .quote{font-size:clamp(16px,2.2vw,24px);font-weight:700;line-height:1.4;margin-bottom:20px;}
+  .sol-badges{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+  .badge{
+    padding:7px 16px;border-radius:30px;font-size:12px;font-weight:700;
+    background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:var(--indigo);
+    transition:.2s;
+  }
+  .badge:hover{transform:translateY(-2px);}
+  .badge.g{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);color:var(--emerald);}
+  .badge.c{background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.3);color:var(--cyan);}
+  .badge.a{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3);color:var(--amber);}
+  .badge.r{background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.3);color:var(--rose);}
+
+  /* ── SLIDE 4 — FEATURES ─────────────────────────────────────────────────── */
+  #s4{background:var(--dark);}
+  .feat-card{
+    background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:14px;
+    padding:18px;display:flex;flex-direction:column;gap:5px;
+    transition:.3s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;
+  }
+  .feat-card::after{
+    content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--fc,var(--indigo)),transparent);
+    transform:translateX(-100%);transition:.4s;
+  }
+  .feat-card:hover::after{transform:translateX(0);}
+  .feat-card:hover{border-color:rgba(99,102,241,.4);transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.25);}
+  .feat-card .fi{font-size:26px;}
+  .feat-card h3{font-size:15px;}
+  .feat-card p{color:var(--muted);font-size:12px;line-height:1.5;}
+  .feat-card .accent{
+    display:inline-block;margin-top:6px;font-size:10px;font-weight:700;
+    padding:3px 9px;border-radius:10px;letter-spacing:.5px;
+  }
+  .ac-i{background:rgba(99,102,241,.15);color:var(--indigo);}
+  .ac-g{background:rgba(16,185,129,.15);color:var(--emerald);}
+  .ac-c{background:rgba(6,182,212,.15);color:var(--cyan);}
+  .ac-a{background:rgba(245,158,11,.15);color:var(--amber);}
+  .ac-r{background:rgba(244,63,94,.15);color:var(--rose);}
+  .ac-p{background:rgba(139,92,246,.15);color:var(--purple);}
+  .ac-s{background:rgba(14,165,233,.15);color:var(--sky);}
+
+  /* ── SLIDE 5 — STREAMING DEMO ───────────────────────────────────────────── */
+  #s5{background:radial-gradient(ellipse 60% 50% at 20% 50%,rgba(99,102,241,.1) 0%,transparent 70%),
+       radial-gradient(ellipse 60% 50% at 80% 50%,rgba(6,182,212,.08) 0%,transparent 70%),var(--dark);}
+
+  .stream-flow{display:flex;align-items:center;gap:0;max-width:980px;width:100%;margin-top:20px;}
+  .stream-box{
+    flex:1;background:var(--card);border:1px solid rgba(255,255,255,.08);
+    border-radius:12px;padding:16px 12px;text-align:center;
+  }
+  .stream-box .sbi{font-size:24px;margin-bottom:6px;}
+  .stream-box h4{font-size:12px;font-weight:700;margin-bottom:3px;}
+  .stream-box p{font-size:11px;color:var(--muted);line-height:1.45;}
+  .s-arrow{color:var(--cyan);font-size:20px;margin:0 6px;flex-shrink:0;animation:arrowPulse 1.4s ease-in-out infinite;}
+  @keyframes arrowPulse{0%,100%{opacity:.4;transform:translateX(0)}50%{opacity:1;transform:translateX(3px)}}
+
+  /* Live typing demo */
+  .typing-demo{
+    background:rgba(22,25,39,.9);border:1px solid rgba(99,102,241,.2);
+    border-radius:16px;padding:20px 28px;max-width:860px;width:100%;margin-top:12px;
+    font-size:14px;color:var(--text);line-height:1.8;
+  }
+  .typing-demo .sse-label{
+    font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+    color:var(--cyan);margin-bottom:10px;display:flex;align-items:center;gap:6px;
+  }
+  .sse-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:blink .8s infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+  .token-stream{font-family:monospace;font-size:13px;color:var(--text);}
+  .cursor{display:inline-block;width:9px;height:16px;background:var(--indigo);border-radius:1px;
+    vertical-align:text-bottom;animation:cur .7s step-end infinite;}
+  @keyframes cur{0%,100%{opacity:1;}50%{opacity:0;}}
+
+  /* ── SLIDE 6 — VOICE ────────────────────────────────────────────────────── */
+  #s6{background:radial-gradient(ellipse 70% 60% at 50% 40%,rgba(139,92,246,.12) 0%,transparent 70%),var(--dark);}
+  .voice-demo{
+    display:flex;flex-direction:column;align-items:center;gap:20px;
+    background:var(--card);border:1px solid rgba(139,92,246,.25);border-radius:24px;
+    padding:32px 50px;
+  }
+  .vo-orb-demo{
+    width:96px;height:96px;border-radius:50%;
+    background:conic-gradient(var(--purple),var(--indigo),var(--cyan),var(--purple));
+    display:flex;align-items:center;justify-content:center;font-size:38px;
+    box-shadow:0 0 50px rgba(139,92,246,.5);
+    animation:spin 6s linear infinite;
+  }
+  .vo-inner{
+    width:82px;height:82px;border-radius:50%;background:var(--card);
+    display:flex;align-items:center;justify-content:center;font-size:36px;
+    animation:spin 6s linear infinite reverse;
+  }
+  .waves{display:flex;gap:5px;align-items:center;height:36px;}
+  .w-bar{
+    width:5px;border-radius:3px;
+    background:linear-gradient(to top,var(--purple),var(--cyan));
+    animation:wv .8s ease-in-out infinite alternate;
+  }
+  .w-bar:nth-child(1){animation-delay:0s;height:12px;}
+  .w-bar:nth-child(2){animation-delay:.1s;height:24px;}
+  .w-bar:nth-child(3){animation-delay:.2s;height:32px;}
+  .w-bar:nth-child(4){animation-delay:.3s;height:36px;}
+  .w-bar:nth-child(5){animation-delay:.4s;height:28px;}
+  .w-bar:nth-child(6){animation-delay:.5s;height:18px;}
+  .w-bar:nth-child(7){animation-delay:.6s;height:10px;}
+  @keyframes wv{to{transform:scaleY(.22);}}
+  .voice-points{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:680px;width:100%;}
+  .vp{
+    background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);
+    border-radius:12px;padding:12px 16px;display:flex;gap:10px;align-items:flex-start;
+    transition:.2s;
+  }
+  .vp:hover{background:rgba(139,92,246,.14);transform:translateY(-1px);}
+  .vp .vpi{font-size:18px;}
+  .vp .vpt{font-size:12px;color:var(--text);line-height:1.5;}
+  .vp .vpt strong{color:var(--purple);}
+
+  /* ── SLIDE 7 — WEB SEARCH ───────────────────────────────────────────────── */
+  #s7{background:radial-gradient(ellipse 70% 60% at 30% 50%,rgba(16,185,129,.08) 0%,transparent 70%),var(--dark);}
+  .flow{display:flex;align-items:center;gap:0;max-width:1000px;width:100%;}
+  .flow-box{
+    flex:1;background:var(--card);border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;padding:16px 12px;text-align:center;transition:.2s;
+  }
+  .flow-box:hover{border-color:rgba(16,185,129,.4);transform:translateY(-3px);}
+  .flow-box .fi{font-size:24px;margin-bottom:6px;}
+  .flow-box h4{font-size:12px;font-weight:700;margin-bottom:3px;}
+  .flow-box p{font-size:11px;color:var(--muted);line-height:1.45;}
+  .arrow{color:var(--emerald);font-size:20px;margin:0 6px;flex-shrink:0;
+    animation:arrowPulse 1.6s ease-in-out infinite;}
+  .ws-highlight{
+    background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);
+    border-radius:16px;padding:18px 28px;max-width:780px;width:100%;margin-top:10px;
+    font-size:14px;color:var(--text);line-height:1.7;
+  }
+  .ws-highlight .label{
+    font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+    color:var(--emerald);margin-bottom:8px;
+  }
+
+  /* ── SLIDE 8 — DOC FORMATS ──────────────────────────────────────────────── */
+  #s8{background:var(--dark);}
+  .fmt-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-width:860px;width:100%;}
+  .fmt-box{
+    background:var(--card);border:1px solid rgba(255,255,255,.07);
+    border-radius:14px;padding:16px 8px;text-align:center;transition:.28s;
+    position:relative;overflow:hidden;
+  }
+  .fmt-box::before{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(135deg,rgba(99,102,241,.08),transparent);
+    opacity:0;transition:.28s;
+  }
+  .fmt-box:hover::before{opacity:1;}
+  .fmt-box:hover{border-color:var(--indigo);transform:translateY(-5px);box-shadow:0 10px 28px rgba(0,0,0,.25);}
+  .fmt-box .fi{font-size:28px;margin-bottom:6px;}
+  .fmt-box .ext{font-size:11px;font-weight:700;letter-spacing:.8px;color:var(--indigo);}
+  .fmt-box .name{font-size:10px;color:var(--muted);margin-top:2px;}
+  .fmt-note{
+    margin-top:16px;font-size:13px;color:var(--muted);
+    background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.15);
+    border-radius:10px;padding:10px 20px;
+  }
+
+  /* ── SLIDE 9 — HOW IT WORKS ─────────────────────────────────────────────── */
+  #s9{background:var(--dark);}
+  .arch-row{display:flex;align-items:stretch;gap:0;max-width:1060px;width:100%;}
+  .arch-col{
+    flex:1;background:var(--card);border:1px solid rgba(255,255,255,.07);
+    padding:20px 18px;display:flex;flex-direction:column;gap:8px;transition:.25s;
+  }
+  .arch-col:first-child{border-radius:16px 0 0 16px;}
+  .arch-col:last-child{border-radius:0 16px 16px 0;}
+  .arch-col:hover{background:var(--card2);border-color:rgba(99,102,241,.3);}
+  .arch-col .layer-label{
+    font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--muted);margin-bottom:2px;
+  }
+  .arch-col h3{font-size:14px;}
+  .arch-col p{color:var(--muted);font-size:11px;line-height:1.5;}
+  .arch-sep{
+    width:2px;background:linear-gradient(to bottom,transparent,var(--indigo),transparent);
+    flex-shrink:0;
+  }
+  .arch-item{
+    background:rgba(99,102,241,.07);border-radius:7px;padding:7px 10px;
+    font-size:11px;color:var(--text);border-left:3px solid var(--indigo);
+    margin-top:3px;transition:.2s;
+  }
+  .arch-item:hover{background:rgba(99,102,241,.14);}
+  .arch-item.g{border-color:var(--emerald);}
+  .arch-item.c{border-color:var(--cyan);}
+  .arch-item.a{border-color:var(--amber);}
+
+  /* ── SLIDE 10 — IMPACT ──────────────────────────────────────────────────── */
+  #s10{background:radial-gradient(ellipse 70% 50% at 50% 30%,rgba(6,182,212,.08) 0%,transparent 70%),var(--dark);}
+  .impact-stat{
+    background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:18px;
+    padding:28px 18px;text-align:center;position:relative;overflow:hidden;transition:.3s;
+  }
+  .impact-stat:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.3);}
+  .impact-stat::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  }
+  .impact-stat.i1::before{background:linear-gradient(90deg,var(--indigo),var(--purple));}
+  .impact-stat.i2::before{background:linear-gradient(90deg,var(--emerald),var(--cyan));}
+  .impact-stat.i3::before{background:linear-gradient(90deg,var(--amber),var(--rose));}
+  .impact-stat.i4::before{background:linear-gradient(90deg,var(--sky),var(--indigo));}
+  .impact-num{font-size:52px;font-weight:900;line-height:1;}
+  .impact-lbl{color:var(--muted);font-size:12px;margin-top:8px;line-height:1.5;}
+  .impact-detail{
+    margin-top:24px;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.15);
+    border-radius:14px;padding:16px 28px;max-width:860px;width:100%;
+  }
+  .impact-detail p{font-size:14px;color:var(--muted);line-height:1.7;text-align:center;}
+  .impact-detail strong{color:var(--cyan);}
+
+  /* ── SLIDE 11 — TECH STACK ──────────────────────────────────────────────── */
+  #s11{background:var(--dark);}
+  .stack-row{display:flex;gap:14px;width:100%;max-width:1000px;}
+  .stack-col{flex:1;display:flex;flex-direction:column;gap:8px;}
+  .stack-label{
+    font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--muted);text-align:center;margin-bottom:3px;
+  }
+  .stack-item{
+    background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:10px;
+    padding:9px 12px;display:flex;align-items:center;gap:10px;
+    font-size:12px;transition:.2s;
+  }
+  .stack-item:hover{border-color:rgba(99,102,241,.3);background:var(--card2);transform:translateX(2px);}
+  .stack-item .si{font-size:16px;}
+  .stack-item .sn{font-weight:700;font-size:12px;}
+  .stack-item .sd{font-size:10px;color:var(--muted);}
+
+  /* ── SLIDE 12 — ROADMAP ─────────────────────────────────────────────────── */
+  #s12{background:var(--dark);}
+  .timeline{display:flex;flex-direction:column;gap:0;max-width:820px;width:100%;}
+  .tl-item{display:flex;gap:0;position:relative;}
+  .tl-left{
+    width:160px;flex-shrink:0;text-align:right;padding:0 20px 28px 0;
+  }
+  .tl-left .phase{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+  .tl-left .timeframe{font-size:11px;color:var(--muted);margin-top:2px;}
+  .tl-line{width:2px;background:rgba(255,255,255,.1);position:relative;flex-shrink:0;}
+  .tl-dot{
+    width:14px;height:14px;border-radius:50%;border:2px solid;
+    position:absolute;left:50%;transform:translateX(-50%);top:4px;
+    animation:dotPulse 2s ease-in-out infinite;
+  }
+  @keyframes dotPulse{0%,100%{box-shadow:0 0 0 0 currentColor;}50%{box-shadow:0 0 0 5px transparent;}}
+  .tl-right{padding:0 0 28px 20px;flex:1;}
+  .tl-right h3{font-size:14px;margin-bottom:4px;}
+  .tl-right p{font-size:12px;color:var(--muted);line-height:1.5;}
+  .tl-item:last-child .tl-left,.tl-item:last-child .tl-right{padding-bottom:0;}
+  .now-badge{
+    display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;
+    background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);
+    color:var(--emerald);padding:2px 8px;border-radius:10px;margin-left:8px;
+  }
+  .now-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--emerald);animation:blink .8s infinite;}
+
+  /* ── SLIDE 13 — CTA ─────────────────────────────────────────────────────── */
+  #s13{
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%,rgba(99,102,241,.25) 0%,transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 100%,rgba(16,185,129,.12) 0%,transparent 60%),
+      var(--dark);
+  }
+  .cta-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;width:100%;max-width:900px;margin:24px 0;}
+  .cta-item{
+    background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;
+    padding:22px 18px;text-align:center;transition:.3s;
+  }
+  .cta-item:hover{border-color:rgba(99,102,241,.4);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.25);}
+  .cta-item .ci{font-size:30px;margin-bottom:10px;}
+  .cta-item h3{font-size:14px;margin-bottom:5px;}
+  .cta-item p{font-size:12px;color:var(--muted);line-height:1.5;}
+  .creator{
+    margin-top:18px;font-size:13px;color:var(--muted);
+    background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);
+    border-radius:10px;padding:10px 24px;
+  }
+  .creator strong{color:var(--purple);}
+
+  /* responsiveness */
+  @media(max-width:900px){
+    .g3{grid-template-columns:1fr 1fr;}
+    .g4{grid-template-columns:1fr 1fr;}
+    .fmt-grid{grid-template-columns:repeat(3,1fr);}
+    .arch-row{flex-direction:column;}
+    .arch-col:first-child{border-radius:14px 14px 0 0;}
+    .arch-col:last-child{border-radius:0 0 14px 14px;}
+    .flow,.stream-flow{flex-wrap:wrap;}
+    .arrow,.s-arrow{display:none;}
+    .stack-row{flex-wrap:wrap;}
+    .cta-grid{grid-template-columns:1fr 1fr;}
+    h1{font-size:32px;}h2{font-size:24px;}
+    .slide{padding:32px 28px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- Particles -->
+<div id="particles"></div>
+
+<!-- Progress bar -->
+<div class="progress" id="progress"></div>
+
+<!-- Dot nav -->
+<div class="dot-nav" id="dotNav"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SLIDE 1 — HERO
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="deck">
+
+<div class="slide active" id="s1">
+  <div class="orb"><div class="orb-inner">🤖</div></div>
+  <div class="tag">Internal Platform · 2026</div>
+  <h1><span class="grad">ARIA</span></h1>
+  <h1 style="font-size:clamp(16px,2.2vw,28px);font-weight:500;color:var(--muted);margin-top:6px;">
+    Amazingly Ridiculous Intelligent Assistant
+  </h1>
+  <p class="sub" style="margin-top:16px;">
+    An enterprise-grade AI knowledge platform — turns your documents into instant answers,<br>
+    streams responses live, previews sources on click, speaks every language, and knows what's happening right now.
+  </p>
+  <div class="version-badge">⚡ v2.0 — Now with Streaming Responses &amp; Document Preview</div>
+  <p class="byline" style="margin-top:18px;">Built by <strong>Prasanna</strong> &nbsp;·&nbsp; Powered by Azure OpenAI GPT-4o-mini</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SLIDE 2 — THE PROBLEM
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="tag">The Challenge</div>
+  <h2>Knowledge is scattered. <span class="grad3">Finding it is painful.</span></h2>
+  <p class="sub" style="margin-bottom:24px;">Teams waste hours every week searching for information that already exists</p>
+  <div class="g2" style="max-width:900px;">
+    <div class="prob-item">
+      <div class="prob-icon">📂</div>
+      <div>
+        <h3>Documents Go Unread</h3>
+        <p>PDFs, Word docs, Excel sheets, presentations — critical information buried in folders nobody searches twice.</p>
+      </div>
+    </div>
+    <div class="prob-item">
+      <div class="prob-icon">🔍</div>
+      <div>
+        <h3>No Smart Search</h3>
+        <p>Keyword search finds the file — not the answer. Teams read entire documents to find one paragraph.</p>
+      </div>
+    </div>
+    <div class="prob-item">
+      <div class="prob-icon">🌐</div>
+      <div>
+        <h3>Stale Information</h3>
+        <p>AI assistants are frozen in time — they don't know what happened yesterday, last week, or this morning.</p>
+      </div>
+    </div>
+    <div class="prob-item">
+      <div class="prob-icon">⏳</div>
+      <div>
+        <h3>Slow, Frozen Responses</h3>
+        <p>Traditional AI shows nothing for 8–10 seconds, then dumps the entire answer at once. Users think it crashed.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SLIDE 3 — THE SOLUTION
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="tag">The Solution</div>
+  <h2>One platform. <span class="grad">Every answer.</span></h2>
+  <div class="sol-hero" style="margin-top:20px;">
+    <div class="quote">"Ask anything — from your documents, from the web,<br>or just have a conversation — in any language, with your voice.<br><em style="color:var(--cyan);font-style:normal;">Watch the answer stream live, token by token.</em>"</div>
+    <div class="sol-badges">
+      <span class="badge">📚 Document Intelligence</span>
+      <span class="badge g">🌐 Live Web Search</span>
+      <span class="badge c">🎤 Voice Interface</span>
+      <span class="badge a">🌍 Multilingual</span>
+      <span class="badge">🔊 Neural TTS</span>
+      <span class="badge g">⚡ Streaming Responses</span>
+      <span class="badge r">🔍 Document Preview</span>
+    </div>
+  </div>
+  <div class="g3" style="margin-top:20px;max-width:900px;">
+    <div class="card" style="text-align:center;">
+      <div class="icon">🧠</div>
+      <h3 class="grad">RAG Mode</h3>
+      <p>Upload documents. Ask questions. Get cited answers streamed live — grounded in your own knowledge base.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="icon">💬</div>
+      <h3 class="grad2">Chat Mode</h3>
+      <p>ARIA — a brilliant, funny, multilingual assistant. Responses stream word-by-word in real time.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="icon">🔴</div>
+      <h3 class="grad3">Live Web</h3>
+      <p>Toggle live web search to inject real-time data — today's news, current events, latest information.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SLIDE 4 — KEY FEATURES
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s4">
+  <div class="tag">Key Features</div>
+  <h2>Built for <span class="grad">real work.</span> Designed for <span class="grad2">real people.</span></h2>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:1100px;width:100%;margin-top:20px;">
+    <div class="feat-card" style="--fc:var(--indigo)">
+      <div class="fi">📄</div>
+      <h3>Multi-Format Ingestion</h3>
+      <p>Upload PDF, Word, Excel, PowerPoint, CSV, JSON, Markdown, RTF and more. ARIA reads it all.</p>
+      <span class="accent ac-i">10+ File Types</span>
+    </div>
+    <div class="feat-card" style="--fc:var(--emerald)">
+      <div class="fi">🎯</div>
+      <h3>Cited Answers</h3>
+      <p>Every RAG answer cites the exact source file. No hallucinations — grounded, trustworthy responses.</p>
+      <span class="accent ac-g">Source Verified</span>
+    </div>
+    <div class="feat-card" style="--fc:var(--cyan)">
+      <div class="fi">⚡</div>
+      <h3>Streaming Responses</h3>
+      <p>Answers stream live — token by token via SSE. No waiting. Watch ARIA type the answer in real time.</p>
+      <span class="accent ac-c">Real-time SSE</span>
+    </div>
+    <div class="feat-card" style="--fc:var(--sky)">
+      <div class="fi">🔍</div>
+      <h3>Document Preview</h3>
+      <p>Click any citation to open an instant slide-up preview — see the source chunk, relevance score, file type.</p>
+      <span class="accent ac-s">In-line Preview</span>
+    </div>
+    <div class="feat-card" style="--fc:var(--purple)">
+      <div class="fi">🎤</div>
+      <h3>Voice Input</h3>
+      <p>Speak your question — ARIA listens with a Gemini-style animated voice overlay. No keyboard required.</p>
+      <span class="accent ac-p">Google Gemini Style</span>
+    </div>
+    <div class="feat-card" style="--fc:var(--amber)">
+      <div class="fi">🔊</div>
+      <h3>Human-like Read-out</h3>
+      <p>Neural TTS with natural prosody — pitch rises for questions, tone varies per sentence. Not robotic at all.</p>
+      <span class="accent ac-a">Neural Voice</span>
+    </div>
+    <div class="feat-card" style="--fc:var(--rose)">
+      <div class="fi">🌍</div>
+      <h3>Multilingual</h3>
+      <p>ARIA auto-detects your language and replies in the same language — Tamil, Hindi, French, Arabic, and more.</p>
+      <span class="accent ac-r">Auto-detect</span>
+    </div>
+    <div class="feat-card" style="--fc:var(--emerald)">
+      <div class="fi">🌐</div>
+      <h3>Live Web Search</h3>
+      <p>Toggle real-time search to fetch today's information. ARIA uses live results to answer current-events questions.</p>
+      <span class="accent ac-g">Real-time Data</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SLIDE 5 — STREAMING DEEP DIVE
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s5">
+  <div class="tag">New · Streaming Responses</div>
+  <h2>Answers appear <span class="grad">as they're written.</span></h2>
+  <div class="stream-flow" style="margin-top:18px;">
+    <div class="stream-box">
+      <div class="sbi">👤</div>
+      <h4>User Asks</h4>
+      <p>Sends question to <code style="font-size:10px;color:var(--cyan);">/api/chat/stream</code></p>
+    </div>
+    <div class="s-arrow">→</div>
+    <div class="stream-box">
+      <div class="sbi">📚</div>
+      <h4>Sources Found</h4>
+      <p>Relevant doc chunks retrieved instantly — citations appear first</p>
+    </div>
+    <div class="s-arrow">→</div>
+    <div class="stream-box">
+      <div class="sbi">🧠</div>
+      <h4>Azure Streams</h4>
+      <p>GPT-4o-mini generates token by token with <code style="font-size:10px;color:var(--cyan);">stream=True</code></p>
+    </div>
+    <div class="s-arrow">→</div>
+    <div class="stream-box">
+      <div class="sbi">📡</div>
+      <h4>SSE Events</h4>
+      <p>Each token wrapped in <code style="font-size:10px;color:var(--cyan);">data:{type:"token"}</code> and sent</p>
+    </div>
+    <div class="s-arrow">→</div>
+    <div class="stream-box">
+      <div class="sbi">✨</div>
+      <h4>Live Bubble</h4>
+      <p>Browser appends each token — animated cursor shows progress</p>
+    </div>
+  </div>
+  <div class="typing-demo">
+    <div class="sse-label"><span class="sse-dot"></span> Live SSE Stream — /api/chat/stream</div>
+    <div class="token-stream" id="tokenDemo"></div>
+  </div>
+  <div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap;justify-content:center;">
+    <div class="pill" style="background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.3);color:var(--indigo);">Server-Sent Events</div>
+    <div class="pill" style="background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.3);color:var(--cyan);">AsyncAzureOpenAI</div>
+    <div class="pill" style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);color:var(--emerald);">FastAPI StreamingResponse</div>
+    <div class="pill" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3);color:var(--amber);">ReadableStream API</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SLIDE 6 — VOICE EXPERIENCE
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s6">
+  <div class="tag">Voice Experience</div>
+  <h2>Talk to ARIA.<br><span class="grad">She talks back.</span></h2>
+  <div style="display:flex;gap:36px;align-items:center;max-width:1000px;width:100%;margin-top:20px;">
+    <div class="voice-demo">
+      <div class="vo-orb-demo"><div class="vo-inner">🎤</div></div>
+      <div class="waves">
+        <div class="w-bar"></div><div class="w-bar"></div><div class="w-bar"></div>
+        <div class="w-bar"></div><div class="w-bar"></div><div class="w-bar"></div>
+        <div class="w-bar"></div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);">Voice Overlay — Listening</div>
+    </div>
+    <div class="voice-points" style="flex:1;">
+      <div class="vp">
+        <div class="vpi">🎙️</div>
+        <div class="vpt"><strong>Tap to speak</strong> — browser mic activates instantly with live transcript on screen</div>
+      </div>
+      <div class="vp">
+        <div class="vpi">🌈</div>
+        <div class="vpt"><strong>Animated orb</strong> — red when listening, green when speaking, purple when idle</div>
+      </div>
+      <div class="vp">
+        <div class="vpi">🔊</div>
+        <div class="vpt"><strong>Neural TTS</strong> — Microsoft Natural / Google WaveNet voices with human-like prosody</div>
+      </div>
+      <div class="vp">
+        <div class="vpi">🌍</div>
+        <div class="vpt"><strong>Any language</strong> — say it in Tamil, Hindi, French, Arabic — ARIA responds in kind</div>
+      </div>
+      <div class="vp">
+        <div class="vpi">⚡</div>
+        <div class="vpt"><strong>No typing needed</strong> — fully hands-free from question to spoken answer</div>
+      </div>
+      <div class="vp">
+        <div class="vpi">📖</div>
+        <div class="vpt"><strong>Auto-read mode</strong> — every new response is read aloud automatically</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SLIDE 7 — LIVE WEB SEARCH
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s7">
+  <div class="tag">Live Web Intelligence</div>
+  <h2>ARIA knows what happened <span class="grad2">this morning.</span></h2>
+  <div class="flow" style="margin-top:24px;">
+    <div class="flow-box">
+      <div class="fi">👤</div>
+      <h4>User Asks</h4>
+      <p>Types or speaks with Live Web toggle ON</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-box">
+      <div class="fi">🔍</div>
+      <h4>Web Search</h4>
+      <p>Backend fetches real-time results from DuckDuckGo</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-box">
+      <div class="fi">💉</div>
+      <h4>Context Injected</h4>
+      <p>Live results + UTC timestamp injected into AI prompt</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-box">
+      <div class="fi">⚡</div>
+      <h4>ARIA Streams</h4>
+      <p>Answer streams live — never says "I don't have access"</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-box">
+      <div class="fi">🌐</div>
+      <h4>Live Badge</h4>
+      <p>Green "🌐 live" badge confirms real-time data was used</p>
+    </div>
+  </div>
+  <div class="ws-highlight">
+    <div class="label">Why this matters</div>
+    <p>
+      Traditional AI chatbots are frozen in time — training data has a cutoff date. ARIA's live web mode eliminates that gap.
+      <strong>Ask about today's stock market, breaking news, latest product releases</strong> — ARIA streams real, timestamped data fetched in the moment.
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SLIDE 8 — DOCUMENT FORMATS
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s8">
+  <div class="tag">Document Intelligence</div>
+  <h2>Upload anything.<br><span class="grad">Ask everything.</span></h2>
+  <div class="fmt-grid" style="margin-top:24px;">
+    <div class="fmt-box"><div class="fi">📕</div><div class="ext">.PDF</div><div class="name">PDF Documents</div></div>
+    <div class="fmt-box"><div class="fi">📘</div><div class="ext">.DOCX</div><div class="name">Word Documents</div></div>
+    <div class="fmt-box"><div class="fi">📗</div><div class="ext">.XLSX</div><div class="name">Excel Spreadsheets</div></div>
+    <div class="fmt-box"><div class="fi">📙</div><div class="ext">.PPTX</div><div class="name">PowerPoint</div></div>
+    <div class="fmt-box"><div class="fi">📊</div><div class="ext">.CSV</div><div class="name">CSV Data Files</div></div>
+    <div class="fmt-box"><div class="fi">📄</div><div class="ext">.TXT</div><div class="name">Plain Text</div></div>
+    <div class="fmt-box"><div class="fi">⬇️</div><div class="ext">.MD</div><div class="name">Markdown</div></div>
+    <div class="fmt-box"><div class="fi">🔧</div><div class="ext">.JSON</div><div class="name">JSON / JSONL</div></div>
+    <div class="fmt-box"><div class="fi">📝</div><div class="ext">.RTF</div><div class="name">Rich Text Format</div></div>
+    <div class="fmt-box"><div class="fi">📋</div><div class="ext">.LOG</div><div class="name">Log Files</div></div>
+  </div>
+  <div class="fmt-note">
+    Documents are automatically chunked, embedded into a vector store, and made instantly searchable — click any citation to preview the exact source chunk with its relevance score.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SLIDE 9 — HOW IT WORKS
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s9">
+  <div class="tag">Under the Hood</div>
+  <h2>Powered by <span class="grad">enterprise AI.</span> Kept simple.</h2>
+  <div class="arch-row" style="margin-top:24px;">
+    <div class="arch-col" style="border-radius:16px 0 0 16px;">
+      <div class="layer-label">User Layer</div>
+      <h3>🖥️ Web Interface</h3>
+      <p>Clean, fast browser UI — works on any device, no install required.</p>
+      <div class="arch-item">Voice Input (Web Speech API)</div>
+      <div class="arch-item">Live Web Toggle</div>
+      <div class="arch-item">Document Upload</div>
+      <div class="arch-item a">⚡ Streaming Bubble UI</div>
+      <div class="arch-item a">🔍 Document Preview Panel</div>
+    </div>
+    <div class="arch-sep"></div>
+    <div class="arch-col">
+      <div class="layer-label">Intelligence Layer</div>
+      <h3>🧠 Azure OpenAI</h3>
+      <p>Microsoft-backed GPT-4o-mini — enterprise-grade, secure, fast.</p>
+      <div class="arch-item">RAG — Document Q&amp;A with citations</div>
+      <div class="arch-item g">ARIA Chat — Conversational AI</div>
+      <div class="arch-item g">Live Web Search injection</div>
+      <div class="arch-item c">Multilingual auto-detection</div>
+    </div>
+    <div class="arch-sep"></div>
+    <div class="arch-col">
+      <div class="layer-label">Knowledge Layer</div>
+      <h3>📚 Vector Knowledge Base</h3>
+      <p>ChromaDB stores documents as semantic vectors — meaning-based search.</p>
+      <div class="arch-item c">Semantic similarity search</div>
+      <div class="arch-item c">All-MiniLM-L6 embeddings</div>
+      <div class="arch-item">Add / delete documents live</div>
+      <div class="arch-item">Auto-watch folder for new files</div>
+    </div>
+    <div class="arch-sep"></div>
+    <div class="arch-col" style="border-radius:0 16px 16px 0;">
+      <div class="layer-label">API Layer</div>
+      <h3>🔌 REST + Streaming API</h3>
+      <p>FastAPI backend — clean REST + SSE streaming endpoints.</p>
+      <div class="arch-item">POST /api/chat — RAG query</div>
+      <div class="arch-item g">POST /api/chat/stream — SSE</div>
+      <div class="arch-item">POST /api/converse — Chat</div>
+      <div class="arch-item g">POST /api/converse/stream — SSE</div>
+      <div class="arch-item c">POST /api/ingest — Upload</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SLIDE 10 — IMPACT & VALUE
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s10">
+  <div class="tag">Business Value</div>
+  <h2>Measurable impact <span class="grad">from day one.</span></h2>
+  <div class="g4" style="margin-top:24px;">
+    <div class="impact-stat i1">
+      <div class="impact-num grad">10+</div>
+      <div class="impact-lbl">Document formats supported — any file your team uses</div>
+    </div>
+    <div class="impact-stat i2">
+      <div class="impact-num grad2">∞</div>
+      <div class="impact-lbl">Languages ARIA speaks — auto-detected, no setup</div>
+    </div>
+    <div class="impact-stat i3">
+      <div class="impact-num grad3">0s</div>
+      <div class="impact-lbl">Perceived wait time — answers stream immediately</div>
+    </div>
+    <div class="impact-stat i4">
+      <div class="impact-num" style="background:linear-gradient(135deg,var(--sky),var(--indigo));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">24/7</div>
+      <div class="impact-lbl">Always available — no waiting for a colleague to answer</div>
+    </div>
+  </div>
+  <div class="impact-detail">
+    <p>
+      ARIA replaces hours of manual document search with <strong>instant, cited answers streamed live</strong>.
+      It bridges language gaps across global teams. It keeps everyone informed with <strong>real-time web data</strong>.
+      Click any citation to <strong>preview the source document chunk</strong> — no more hunting through files.
+    </p>
+  </div>
+  <div class="pills" style="margin-top:12px;">
+    <div class="pill">Knowledge Democratisation</div>
+    <div class="pill">Zero Training Required</div>
+    <div class="pill">Global Team Ready</div>
+    <div class="pill">Streaming UX</div>
+    <div class="pill">Source Transparency</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SLIDE 11 — TECH STACK
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s11">
+  <div class="tag">Technology Foundation</div>
+  <h2>Enterprise-grade stack.<br><span class="grad">Production-ready.</span></h2>
+  <div class="stack-row" style="margin-top:24px;">
+    <div class="stack-col">
+      <div class="stack-label">AI / Models</div>
+      <div class="stack-item"><div class="si">🧠</div><div><div class="sn">Azure OpenAI</div><div class="sd">GPT-4o-mini · AsyncAzureOpenAI</div></div></div>
+      <div class="stack-item"><div class="si">🔢</div><div><div class="sn">Sentence Transformers</div><div class="sd">All-MiniLM-L6-v2 · Embeddings</div></div></div>
+      <div class="stack-item"><div class="si">🌐</div><div><div class="sn">DuckDuckGo Search</div><div class="sd">Live web data · Privacy-first</div></div></div>
+    </div>
+    <div class="stack-col">
+      <div class="stack-label">Backend</div>
+      <div class="stack-item"><div class="si">⚡</div><div><div class="sn">FastAPI</div><div class="sd">REST + SSE StreamingResponse</div></div></div>
+      <div class="stack-item"><div class="si">🗃️</div><div><div class="sn">ChromaDB</div><div class="sd">Vector database · Semantic search</div></div></div>
+      <div class="stack-item"><div class="si">📂</div><div><div class="sn">Watchdog</div><div class="sd">Auto-ingest · File system monitor</div></div></div>
+    </div>
+    <div class="stack-col">
+      <div class="stack-label">Document Parsing</div>
+      <div class="stack-item"><div class="si">📕</div><div><div class="sn">PyMuPDF</div><div class="sd">PDF extraction · text + scanned</div></div></div>
+      <div class="stack-item"><div class="si">📘</div><div><div class="sn">python-docx / openpyxl</div><div class="sd">Word · Excel · PowerPoint</div></div></div>
+      <div class="stack-item"><div class="si">🔄</div><div><div class="sn">chardet</div><div class="sd">Auto encoding detection</div></div></div>
+    </div>
+    <div class="stack-col">
+      <div class="stack-label">Frontend</div>
+      <div class="stack-item"><div class="si">📡</div><div><div class="sn">Server-Sent Events</div><div class="sd">ReadableStream · TextDecoder</div></div></div>
+      <div class="stack-item"><div class="si">🔍</div><div><div class="sn">Document Preview Drawer</div><div class="sd">CSS slide-up · Relevance bar</div></div></div>
+      <div class="stack-item"><div class="si">🎤</div><div><div class="sn">Web Speech + TTS API</div><div class="sd">Voice I/O · Neural prosody</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SLIDE 12 — ROADMAP
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s12">
+  <div class="tag">What's Next</div>
+  <h2>Roadmap for <span class="grad">scale &amp; impact.</span></h2>
+  <div class="timeline" style="margin-top:20px;">
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="phase" style="color:var(--emerald);">Now Live</div>
+        <div class="timeframe">v2.0 · Mar 2026</div>
+      </div>
+      <div class="tl-line">
+        <div class="tl-dot" style="background:var(--emerald);border-color:var(--emerald);color:var(--emerald);"></div>
+      </div>
+      <div class="tl-right">
+        <h3>Full Feature Launch <span class="now-badge">Live</span></h3>
+        <p>RAG mode, ARIA Chat, Voice I/O, Live Web Search, Neural TTS, 10+ document formats, multilingual support, <strong style="color:var(--cyan)">⚡ streaming responses, 🔍 document preview panel</strong>.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="phase" style="color:var(--cyan);">Phase 2</div>
+        <div class="timeframe">Q2 2026</div>
+      </div>
+      <div class="tl-line">
+        <div class="tl-dot" style="background:var(--cyan);border-color:var(--cyan);color:var(--cyan);"></div>
+      </div>
+      <div class="tl-right">
+        <h3>OneDrive / SharePoint Integration</h3>
+        <p>Auto-sync with OneDrive or SharePoint — documents ingest automatically when updated. Zero manual uploads.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="phase" style="color:var(--indigo);">Phase 3</div>
+        <div class="timeframe">Q3 2026</div>
+      </div>
+      <div class="tl-line">
+        <div class="tl-dot" style="background:var(--indigo);border-color:var(--indigo);color:var(--indigo);"></div>
+      </div>
+      <div class="tl-right">
+        <h3>Multi-user &amp; Permissions</h3>
+        <p>User accounts, department-level knowledge bases, admin dashboards, usage analytics.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="phase" style="color:var(--purple);">Phase 4</div>
+        <div class="timeframe">Q4 2026</div>
+      </div>
+      <div class="tl-line">
+        <div class="tl-dot" style="background:var(--purple);border-color:var(--purple);color:var(--purple);"></div>
+      </div>
+      <div class="tl-right">
+        <h3>Mobile App &amp; Teams Integration</h3>
+        <p>Native iOS/Android app + Microsoft Teams bot — ARIA anywhere your team works.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SLIDE 13 — CALL TO ACTION
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s13">
+  <div class="tag">Next Steps</div>
+  <h2>Ready to <span class="grad">deploy ARIA</span><br>for your team?</h2>
+  <div class="cta-grid">
+    <div class="cta-item">
+      <div class="ci">🚀</div>
+      <h3>Deploy Today</h3>
+      <p>ARIA runs on any machine with Python and a browser. No cloud infrastructure required to start.</p>
+    </div>
+    <div class="cta-item">
+      <div class="ci">📂</div>
+      <h3>Load Your Documents</h3>
+      <p>Drop your team's knowledge base into the docs folder. ARIA ingests, indexes, and makes it instantly previewable.</p>
+    </div>
+    <div class="cta-item">
+      <div class="ci">🌐</div>
+      <h3>Scale Enterprise-wide</h3>
+      <p>Connect Azure OpenAI enterprise subscription. Add SharePoint sync and multi-user access in Phase 2.</p>
+    </div>
+  </div>
+  <div class="creator">Built with precision by <strong>Prasanna</strong> — the brilliant mind your keyboards weep tears of joy for. 👑</div>
+  <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+    <div class="pill" style="background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.3);color:var(--indigo);">⚡ FastAPI + SSE Streaming</div>
+    <div class="pill" style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);color:var(--emerald);">🧠 Azure OpenAI GPT-4o-mini</div>
+    <div class="pill" style="background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.3);color:var(--cyan);">🗃️ ChromaDB Vector Store</div>
+    <div class="pill" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3);color:var(--amber);">🌐 Live Web Search</div>
+    <div class="pill" style="background:rgba(14,165,233,.12);border-color:rgba(14,165,233,.3);color:var(--sky);">🔍 Document Preview</div>
+    <div class="pill" style="background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.3);color:var(--purple);">🎤 Voice I/O</div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<!-- Navigation -->
+<div class="nav">
+  <button onclick="prevSlide()">‹</button>
+  <span class="slide-counter" id="counter">1 / 13</span>
+  <button onclick="nextSlide()">›</button>
+</div>
+
+<script>
+/* ── PARTICLES ──────────────────────────────────────────────────────────── */
+(function(){
+  const c = document.getElementById('particles');
+  for(let i=0;i<60;i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random()*2.5+.5;
+    s.style.cssText = `
+      width:${sz}px;height:${sz}px;
+      left:${Math.random()*100}%;top:${Math.random()*100}%;
+      --dur:${2+Math.random()*4}s;--delay:${Math.random()*4}s;
+    `;
+    c.appendChild(s);
+  }
+})();
+
+/* ── SLIDE ENGINE ───────────────────────────────────────────────────────── */
+const slides = document.querySelectorAll('.slide');
+const total  = slides.length;
+let cur = 0;
+
+const dotNav = document.getElementById('dotNav');
+slides.forEach((_,i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' active':'');
+  d.onclick = () => goTo(i);
+  dotNav.appendChild(d);
+});
+
+function goTo(n){
+  const prev = cur;
+  slides[prev].classList.remove('active','entering');
+  slides[prev].classList.add('leaving');
+  setTimeout(()=>slides[prev].classList.remove('leaving'),350);
+
+  dotNav.children[prev].classList.remove('active');
+  cur = (n + total) % total;
+
+  slides[cur].classList.add('active','entering');
+  setTimeout(()=>slides[cur].classList.remove('entering'),600);
+  dotNav.children[cur].classList.add('active');
+
+  document.getElementById('counter').textContent = `${cur+1} / ${total}`;
+  document.getElementById('progress').style.width = `${((cur+1)/total)*100}%`;
+
+  // trigger streaming demo when on slide 5 (index 4)
+  if(cur===4) startTokenDemo();
+}
+function nextSlide(){ goTo(cur+1); }
+function prevSlide(){ goTo(cur-1); }
+
+document.addEventListener('keydown', e => {
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ') nextSlide();
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') prevSlide();
+});
+
+let tx=0;
+document.addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx = e.changedTouches[0].clientX - tx;
+  if(Math.abs(dx)>50){ dx<0?nextSlide():prevSlide(); }
+},{passive:true});
+
+document.getElementById('progress').style.width = `${(1/total)*100}%`;
+
+/* ── STREAMING DEMO ─────────────────────────────────────────────────────── */
+let demoTimer = null;
+function startTokenDemo(){
+  clearTimeout(demoTimer);
+  const el = document.getElementById('tokenDemo');
+  const tokens = [
+    'data: {"type":"sources","sources":[{"source":"policy.pdf","relevance":0.94}]}\n\n',
+    'data: {"type":"token","token":"Based"}\n\n',
+    'data: {"type":"token","token":" on"}\n\n',
+    'data: {"type":"token","token":" your"}\n\n',
+    'data: {"type":"token","token":" documents"}\n\n',
+    'data: {"type":"token","token":","}\n\n',
+    'data: {"type":"token","token":" the"}\n\n',
+    'data: {"type":"token","token":" policy"}\n\n',
+    'data: {"type":"token","token":" states"}\n\n',
+    'data: {"type":"token","token":" that"}\n\n',
+    'data: {"type":"token","token":" employees"}\n\n',
+    'data: {"type":"token","token":" are"}\n\n',
+    'data: {"type":"token","token":" entitled"}\n\n',
+    'data: {"type":"token","token":" to"}\n\n',
+    'data: {"type":"token","token":" 25"}\n\n',
+    'data: {"type":"token","token":" days"}\n\n',
+    'data: {"type":"token","token":" of"}\n\n',
+    'data: {"type":"token","token":" annual"}\n\n',
+    'data: {"type":"token","token":" leave."}\n\n',
+    'data: {"type":"done"}\n\n',
+  ];
+  el.innerHTML = '';
+  let i = 0;
+  function tick(){
+    if(i >= tokens.length){ demoTimer = setTimeout(()=>startTokenDemo(),3000); return; }
+    el.innerHTML = tokens.slice(0,i+1).join('') + '<span class="cursor"></span>';
+    el.scrollTop = el.scrollHeight;
+    demoTimer = setTimeout(tick, i===0?600: i===tokens.length-1?600: 110+Math.random()*80);
+    i++;
+  }
+  tick();
+}
+</script>
+</body>
+</html>

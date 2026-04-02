@@ -1,0 +1,42 @@
+# ── Core RAG stack ──────────────────────────────────────────────────────────
+chromadb>=0.5.0                   # local vector store
+
+# ── Azure OpenAI ─────────────────────────────────────────────────────────────
+openai>=1.30.0                    # AzureOpenAI + AsyncAzureOpenAI client
+httpx>=0.27.0                     # async HTTP transport required by openai
+
+# ── Multi-format document support ───────────────────────────────────────────
+pymupdf>=1.24.0                   # PDF parsing (import fitz)
+python-docx>=1.1.0                # .docx Word documents
+openpyxl>=3.1.0                   # .xlsx Excel spreadsheets
+python-pptx>=0.6.23               # .pptx PowerPoint presentations
+markdown>=3.6                     # .md Markdown files
+chardet>=5.2.0                    # Encoding detection for text files
+striprtf>=0.0.26                  # .rtf Rich Text Format
+
+# ── API server ───────────────────────────────────────────────────────────────
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9           # file upload support
+
+# ── File watcher ─────────────────────────────────────────────────────────────
+watchdog>=4.0.0
+
+# ── MCP server (optional) ────────────────────────────────────────────────────
+mcp>=1.0.0
+
+# ── Web search ───────────────────────────────────────────────────────────────
+ddgs>=0.1.0                       # DuckDuckGo search (replaces duckduckgo_search)
+
+# ── URL crawling & ingestion ──────────────────────────────────────────────────
+trafilatura>=2.0.0                # HTML → clean text extraction (strips nav/ads/footers)
+beautifulsoup4>=4.14.0            # Link extraction for multi-page crawling
+
+# ── Utilities ────────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+
+# ── OCR for images inside PPTX/PDF (optional) ────────────────────────────────
+# Requires Tesseract binary: https://github.com/UB-Mannheim/tesseract/wiki
+pytesseract>=0.3.10
+Pillow>=10.0.0

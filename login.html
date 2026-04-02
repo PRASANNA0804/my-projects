@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARIA · Login</title>
+  <style>
+    /* ── CSS Custom Properties ─────────────────────────────── */
+    :root {
+      --indigo: #6366f1;
+      --purple: #8b5cf6;
+      --cyan:   #06b6d4;
+      --bg:     #080b14;
+      --card-bg: rgba(14, 18, 32, 0.85);
+      --border:  rgba(255, 255, 255, 0.07);
+      --text:    #e2e8f0;
+      --muted:   #64748b;
+      --error:   #f87171;
+      --success: #34d399;
+    }
+
+    /* ── Reset & Base ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ── Background Scene ──────────────────────────────────── */
+    .scene {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    /* Dot/grid overlay */
+    .scene::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+      background-size: 32px 32px;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Gradient orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.55;
+      will-change: transform;
+    }
+    .orb-purple {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, #7c3aed 0%, #4c1d95 60%, transparent 100%);
+      bottom: -180px; left: -150px;
+      animation: floatPurple 22s ease-in-out infinite;
+    }
+    .orb-indigo {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #4f46e5 0%, #312e81 60%, transparent 100%);
+      top: -160px; right: -120px;
+      animation: floatIndigo 25s ease-in-out infinite;
+    }
+    .orb-cyan {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, #0891b2 0%, #164e63 60%, transparent 100%);
+      top: 35%; left: 40%;
+      transform: translate(-50%, -50%);
+      animation: floatCyan 20s ease-in-out infinite;
+    }
+
+    @keyframes floatPurple {
+      0%,100% { transform: translate(0, 0) scale(1); }
+      33%      { transform: translate(40px, -60px) scale(1.08); }
+      66%      { transform: translate(-30px, 40px) scale(0.96); }
+    }
+    @keyframes floatIndigo {
+      0%,100% { transform: translate(0, 0) scale(1); }
+      40%      { transform: translate(-50px, 50px) scale(1.1); }
+      70%      { transform: translate(30px, -30px) scale(0.94); }
+    }
+    @keyframes floatCyan {
+      0%,100% { transform: translate(-50%, -50%) scale(1); }
+      50%      { transform: translate(-50%, -50%) scale(1.15) rotate(30deg); }
+    }
+
+    /* ── Page wrapper ──────────────────────────────────────── */
+    .page {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      gap: 20px;
+    }
+
+    /* ── Glassmorphism Card ────────────────────────────────── */
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 44px 40px 40px;
+      box-shadow:
+        0 32px 80px rgba(0,0,0,0.6),
+        0 0 0 1px rgba(255,255,255,0.04),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
+      animation: cardEntrance 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes cardEntrance {
+      from { opacity: 0; transform: translateY(40px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Scanning light line */
+    .card::after {
+      content: '';
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(99, 102, 241, 0.06) 40%,
+        rgba(139, 92, 246, 0.12) 50%,
+        rgba(99, 102, 241, 0.06) 60%,
+        transparent 100%
+      );
+      animation: scanLine 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes scanLine {
+      0%   { left: -60%; }
+      100% { left: 140%; }
+    }
+
+    /* Card shake on wrong password */
+    .card.shake {
+      animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+    @keyframes shake {
+      10%, 90% { transform: translateX(-3px); }
+      20%, 80% { transform: translateX(5px); }
+      30%, 50%, 70% { transform: translateX(-6px); }
+      40%, 60% { transform: translateX(6px); }
+      100% { transform: translateX(0); }
+    }
+
+    /* ── ARIA Orb ──────────────────────────────────────────── */
+    .orb-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 22px;
+    }
+    .aria-orb {
+      position: relative;
+      width: 72px; height: 72px;
+    }
+    .aria-orb-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        var(--indigo),
+        var(--purple),
+        var(--cyan),
+        var(--indigo)
+      );
+      animation: spinRing 3s linear infinite;
+      padding: 3px;
+    }
+    @keyframes spinRing {
+      to { transform: rotate(360deg); }
+    }
+    .aria-orb-inner {
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      background: #0d1020;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      z-index: 1;
+    }
+
+    /* ── Title & Tagline ───────────────────────────────────── */
+    .title {
+      text-align: center;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--indigo) 0%, var(--purple) 50%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+    .tagline {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 32px;
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    /* ── Error Banner ──────────────────────────────────────── */
+    .error-banner {
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid rgba(248, 113, 113, 0.25);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.8rem;
+      color: var(--error);
+      margin-bottom: 20px;
+      display: none;
+      animation: slideDown 0.3s ease-out both;
+    }
+    .error-banner.visible {
+      display: block;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Input Fields ──────────────────────────────────────── */
+    .field-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .field-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 7px;
+      padding-left: 2px;
+      transition: color 0.2s;
+    }
+    .field-group:focus-within label {
+      color: var(--indigo);
+    }
+    .field-group input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 13px 44px 13px 16px;
+      font-size: 0.95rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+      caret-color: var(--indigo);
+    }
+    .field-group input::placeholder {
+      color: rgba(100, 116, 139, 0.55);
+      font-size: 0.88rem;
+    }
+    .field-group input:focus {
+      border-color: var(--indigo);
+      background: rgba(99, 102, 241, 0.05);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18), 0 0 16px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Eye toggle button — sits inside the input wrapper */
+    .input-wrap {
+      position: relative;
+    }
+    .eye-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+    }
+    .eye-btn:hover { color: var(--indigo); }
+    .eye-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── Remember Me Toggle ────────────────────────────────── */
+    .remember-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: var(--muted);
+      user-select: none;
+    }
+    .toggle-label input[type="checkbox"] { display: none; }
+    .toggle-pill {
+      width: 38px; height: 22px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 99px;
+      position: relative;
+      transition: background 0.25s;
+      flex-shrink: 0;
+    }
+    .toggle-pill::after {
+      content: '';
+      position: absolute;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      top: 3px; left: 3px;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s;
+    }
+    .toggle-label input:checked ~ .toggle-pill {
+      background: var(--indigo);
+    }
+    .toggle-label input:checked ~ .toggle-pill::after {
+      transform: translateX(16px);
+    }
+
+    /* Forgot password */
+    .forgot-wrap {
+      position: relative;
+    }
+    .forgot-link {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+    }
+    .forgot-link:hover { color: var(--indigo); }
+    .forgot-tooltip {
+      position: absolute;
+      right: 0;
+      bottom: calc(100% + 8px);
+      background: rgba(14, 18, 32, 0.98);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.78rem;
+      color: var(--text);
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      display: none;
+      animation: tooltipPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      z-index: 10;
+    }
+    .forgot-tooltip::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      right: 16px;
+      width: 10px; height: 10px;
+      background: rgba(14, 18, 32, 0.98);
+      border-right: 1px solid rgba(99, 102, 241, 0.35);
+      border-bottom: 1px solid rgba(99, 102, 241, 0.35);
+      transform: rotate(45deg);
+    }
+    .forgot-tooltip.visible { display: block; }
+    @keyframes tooltipPop {
+      from { opacity: 0; transform: translateY(6px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ── Login Button ──────────────────────────────────────── */
+    .login-btn {
+      width: 100%;
+      padding: 15px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--indigo) 0%, var(--purple) 100%);
+      color: #fff;
+      transition: transform 0.15s, box-shadow 0.25s;
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+      margin-bottom: 6px;
+    }
+    .login-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(99, 102, 241, 0.55);
+    }
+    .login-btn:active { transform: translateY(0); }
+
+    /* Liquid fill sweep on hover */
+    .login-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--purple) 0%, var(--cyan) 100%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .login-btn:hover::before { opacity: 1; }
+
+    .login-btn-text {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Spinner state */
+    .login-btn.loading {
+      width: 52px !important;
+      height: 52px !important;
+      padding: 0 !important;
+      border-radius: 50% !important;
+      cursor: default;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  border-radius 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  padding 0.3s;
+      pointer-events: none;
+    }
+    .login-btn.loading .login-btn-text { display: none; }
+    .login-btn.loading::after {
+      content: '';
+      width: 22px; height: 22px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      position: relative;
+      z-index: 1;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Footer ────────────────────────────────────────────── */
+    .footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .footer code {
+      background: rgba(255,255,255,0.07);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 0.72rem;
+      color: var(--cyan);
+      font-family: 'Courier New', monospace;
+    }
+    .footer .version {
+      font-size: 0.7rem;
+      opacity: 0.6;
+      margin-top: 2px;
+    }
+
+    /* ── Full-screen Success Overlay ───────────────────────── */
+    #successOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      background: transparent;
+      pointer-events: none;
+      opacity: 0;
+    }
+    #successOverlay.active {
+      pointer-events: all;
+    }
+    #rippleCircle {
+      position: fixed;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, #1e1b4b 0%, #0d1020 60%, #080b14 100%);
+      z-index: 99;
+      transform: scale(0);
+      pointer-events: none;
+    }
+
+    .success-orb-wrap {
+      position: relative;
+      width: 120px; height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .success-orb-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        var(--indigo),
+        var(--purple),
+        var(--cyan),
+        var(--indigo)
+      );
+      animation: spinRing 1.5s linear infinite;
+      padding: 4px;
+    }
+    .success-orb-inner {
+      position: absolute;
+      inset: 5px;
+      border-radius: 50%;
+      background: #0d1020;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      z-index: 1;
+    }
+
+    .success-message {
+      text-align: center;
+      max-width: 440px;
+      padding: 0 24px;
+    }
+    .success-message .typewriter {
+      font-size: 1.05rem;
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 2.5em;
+    }
+    .success-message .typewriter-sub {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 8px;
+      min-height: 1.4em;
+    }
+    .cursor-blink {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--indigo);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 0.7s step-end infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* Canvas */
+    #particleCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 98;
+      pointer-events: none;
+    }
+
+    /* ── Responsive ────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .card { padding: 36px 24px 32px; }
+      .title { font-size: 1.9rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background Scene -->
+<div class="scene">
+  <div class="orb orb-purple"></div>
+  <div class="orb orb-indigo"></div>
+  <div class="orb orb-cyan"></div>
+</div>
+
+<!-- Particle Canvas (behind overlay) -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- Success Ripple -->
+<div id="rippleCircle"></div>
+
+<!-- Success Overlay -->
+<div id="successOverlay">
+  <div class="success-orb-wrap">
+    <div class="success-orb-ring"></div>
+    <div class="success-orb-inner">🤖</div>
+  </div>
+  <div class="success-message">
+    <div class="typewriter" id="typewriterMain"><span class="cursor-blink"></span></div>
+    <div class="typewriter-sub" id="typewriterSub"></div>
+  </div>
+</div>
+
+<!-- Page -->
+<div class="page">
+  <div class="card" id="loginCard">
+
+    <!-- ARIA Orb -->
+    <div class="orb-wrap">
+      <div class="aria-orb">
+        <div class="aria-orb-ring"></div>
+        <div class="aria-orb-inner">🤖</div>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <h1 class="title">ARIA</h1>
+    <p class="tagline">Only brilliant minds allowed.<br>And you, apparently.</p>
+
+    <!-- Error Banner -->
+    <div class="error-banner" id="errorBanner"></div>
+
+    <!-- Form -->
+    <form id="loginForm" autocomplete="off">
+
+      <!-- Username -->
+      <div class="field-group">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          placeholder="Enter your username"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+
+      <!-- Password -->
+      <div class="field-group">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            autocomplete="off"
+          />
+          <button type="button" class="eye-btn" id="eyeBtn" aria-label="Toggle password visibility">
+            <svg id="eyeIcon" viewBox="0 0 24 24">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Remember Me + Forgot -->
+      <div class="remember-row">
+        <label class="toggle-label">
+          <input type="checkbox" id="rememberMe" />
+          <span class="toggle-pill"></span>
+          Remember me
+        </label>
+        <div class="forgot-wrap">
+          <button type="button" class="forgot-link" id="forgotBtn">Forgot password?</button>
+          <div class="forgot-tooltip" id="forgotTooltip">
+            We told you to write it down 😔<br>Hint: <strong>aria2026</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="login-btn" id="loginBtn">
+        <span class="login-btn-text">Enter the ARIA Zone →</span>
+      </button>
+
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div>Demo password: <code>aria2026</code></div>
+    <div class="version">ARIA v2.0 · Built by Prasanna 👑</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Session check on load ─────────────────────────────── */
+  try {
+    const raw = sessionStorage.getItem('aria_auth');
+    if (raw) {
+      const data = JSON.parse(raw);
+      const TTL  = 8 * 60 * 60 * 1000;
+      if (data && data.time && (Date.now() - data.time) < TTL) {
+        window.location.href = 'index_v2.html';
+      }
+    }
+  } catch (e) { /* ignore */ }
+
+  /* ── DOM refs ──────────────────────────────────────────── */
+  const form          = document.getElementById('loginForm');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+  const eyeBtn        = document.getElementById('eyeBtn');
+  const eyeIcon       = document.getElementById('eyeIcon');
+  const errorBanner   = document.getElementById('errorBanner');
+  const loginBtn      = document.getElementById('loginBtn');
+  const loginCard     = document.getElementById('loginCard');
+  const forgotBtn     = document.getElementById('forgotBtn');
+  const forgotTooltip = document.getElementById('forgotTooltip');
+
+  const successOverlay  = document.getElementById('successOverlay');
+  const rippleCircle    = document.getElementById('rippleCircle');
+  const typewriterMain  = document.getElementById('typewriterMain');
+  const typewriterSub   = document.getElementById('typewriterSub');
+  const canvas          = document.getElementById('particleCanvas');
+  const ctx             = canvas.getContext('2d');
+
+  /* ── State ─────────────────────────────────────────────── */
+  let attempts = 0;
+  let tooltipOpen = false;
+
+  /* ── Eye Toggle ────────────────────────────────────────── */
+  eyeBtn.addEventListener('click', function () {
+    const isPassword = passwordInput.type === 'password';
+    passwordInput.type = isPassword ? 'text' : 'password';
+    eyeIcon.innerHTML = isPassword
+      ? /* eye-off */
+        '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+      : /* eye */
+        '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  });
+
+  /* ── Forgot Password Tooltip ───────────────────────────── */
+  forgotBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    tooltipOpen = !tooltipOpen;
+    forgotTooltip.classList.toggle('visible', tooltipOpen);
+    if (tooltipOpen) {
+      // Re-trigger animation
+      forgotTooltip.style.animation = 'none';
+      forgotTooltip.offsetHeight; // reflow
+      forgotTooltip.style.animation = '';
+    }
+  });
+  document.addEventListener('click', function () {
+    if (tooltipOpen) {
+      tooltipOpen = false;
+      forgotTooltip.classList.remove('visible');
+    }
+  });
+
+  /* ── Error messages by attempt ─────────────────────────── */
+  function getErrorMessage(attempt) {
+    switch (attempt) {
+      case 1:  return 'Nope. Not even close. Try again, genius 🧐';
+      case 2:  return "Still wrong. We're beginning to question your intelligence 🤔";
+      case 3:  return 'At this point just guess. We believe in you. (Hint: aria2026) 🙏';
+      default: return '...Have you tried turning your brain off and on again? 🔄';
+    }
+  }
+
+  /* ── Show error ────────────────────────────────────────── */
+  function showError(msg) {
+    errorBanner.textContent = msg;
+    errorBanner.classList.remove('visible');
+    // force reflow for re-animation
+    void errorBanner.offsetWidth;
+    errorBanner.classList.add('visible');
+
+    loginCard.classList.remove('shake');
+    void loginCard.offsetWidth;
+    loginCard.classList.add('shake');
+    loginCard.addEventListener('animationend', function handler() {
+      loginCard.classList.remove('shake');
+      loginCard.removeEventListener('animationend', handler);
+    });
+  }
+
+  /* ── Typewriter helper ─────────────────────────────────── */
+  function typewrite(el, text, speed, callback) {
+    el.innerHTML = '';
+    let i = 0;
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor-blink';
+    el.appendChild(cursor);
+
+    const timer = setInterval(function () {
+      if (i < text.length) {
+        el.insertBefore(document.createTextNode(text[i]), cursor);
+        i++;
+      } else {
+        clearInterval(timer);
+        if (callback) callback();
+      }
+    }, speed);
+  }
+
+  /* ── Particle System ───────────────────────────────────── */
+  const COLORS = ['#6366f1', '#8b5cf6', '#06b6d4', '#ffffff', '#a78bfa', '#67e8f9'];
+  let particles = [];
+  let animFrameId = null;
+
+  function spawnParticles() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const cx = canvas.width  / 2;
+    const cy = canvas.height / 2;
+    particles = [];
+    const count = 70;
+
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2 + Math.random() * 4;
+      particles.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: 2 + Math.random() * 2,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        life: 60 + Math.floor(Math.random() * 20),
+        maxLife: 80
+      });
+    }
+
+    function drawFrame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      for (const p of particles) {
+        if (p.life <= 0) continue;
+        alive = true;
+        const alpha = p.life / p.maxLife;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur  = 6;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.98;
+        p.vy *= 0.98;
+        p.life--;
+      }
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur  = 0;
+      if (alive) {
+        animFrameId = requestAnimationFrame(drawFrame);
+      }
+    }
+    animFrameId = requestAnimationFrame(drawFrame);
+  }
+
+  /* ── Success Sequence ──────────────────────────────────── */
+  function runSuccessSequence(username) {
+    const isVip    = username.toLowerCase() === 'prasanna';
+    const mainMsg  = isVip
+      ? 'Oh! THE Prasanna?! The living legend! 👑 Rolling out the digital red carpet...'
+      : "Identity confirmed. You're either authorized or very lucky. Either way, ARIA has been expecting you.";
+    const subMsg   = 'Loading your universe...';
+
+    /* Step 1: Morph button to spinner (instant CSS class) */
+    loginBtn.classList.add('loading');
+
+    setTimeout(function () {
+      /* Step 2: Ripple from button centre */
+      const btnRect = loginBtn.getBoundingClientRect();
+      const originX = btnRect.left + btnRect.width  / 2;
+      const originY = btnRect.top  + btnRect.height / 2;
+      const maxDim  = Math.hypot(window.innerWidth, window.innerHeight) * 2.2;
+
+      rippleCircle.style.cssText = `
+        width: 60px; height: 60px;
+        left: ${originX - 30}px;
+        top:  ${originY - 30}px;
+        transform: scale(0);
+        transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s;
+        pointer-events: none;
+      `;
+      void rippleCircle.offsetWidth;
+      const scaleTo = maxDim / 60;
+      rippleCircle.style.transform = `scale(${scaleTo})`;
+
+      /* Step 3: Show success overlay + particles after ripple covers screen */
+      setTimeout(function () {
+        successOverlay.style.opacity = '1';
+        successOverlay.classList.add('active');
+        spawnParticles();
+
+        /* Typewrite main message */
+        typewrite(typewriterMain, mainMsg, 28, function () {
+          /* After main message → sub message */
+          setTimeout(function () {
+            typewrite(typewriterSub, subMsg, 40, null);
+          }, 400);
+        });
+
+        /* Step 4: Redirect after 3.2s total from sequence start */
+      }, 600);
+
+    }, 300);
+
+    /* Redirect at 3.2s from start */
+    setTimeout(function () {
+      sessionStorage.setItem('aria_auth', JSON.stringify({
+        user: username,
+        time: Date.now()
+      }));
+      window.location.href = 'index_v2.html';
+    }, 3200);
+  }
+
+  /* ── Form Submit ───────────────────────────────────────── */
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+    const CORRECT  = 'aria2026';
+
+    if (password === CORRECT) {
+      /* Correct password — lock form and run sequence */
+      usernameInput.disabled = true;
+      passwordInput.disabled = true;
+      forgotBtn.disabled = true;
+      errorBanner.classList.remove('visible');
+      runSuccessSequence(username || 'stranger');
+    } else {
+      attempts++;
+      showError(getErrorMessage(attempts));
+    }
+  });
+
+  /* ── Enter key submits form ────────────────────────────── */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      const active = document.activeElement;
+      if (active === usernameInput || active === passwordInput || active === document.body) {
+        form.dispatchEvent(new Event('submit', { cancelable: true }));
+      }
+    }
+  });
+
+  /* ── Resize canvas on window resize ───────────────────── */
+  window.addEventListener('resize', function () {
+    if (particles.length > 0) {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
