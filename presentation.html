@@ -510,7 +510,7 @@
     An enterprise-grade AI knowledge platform — turns your documents into instant answers,<br>
     streams responses live, previews sources on click, speaks every language, and knows what's happening right now.
   </p>
-  <div class="version-badge">⚡ v2.0 — Now with Streaming Responses &amp; Document Preview</div>
+  <div class="version-badge">⚡ v2.1 — Now with URL Crawling · Streaming · Document Preview</div>
   <p class="byline" style="margin-top:18px;">Built by <strong>Prasanna</strong> &nbsp;·&nbsp; Powered by Azure OpenAI GPT-4o-mini</p>
 </div>
 
@@ -569,6 +569,7 @@
       <span class="badge">🔊 Neural TTS</span>
       <span class="badge g">⚡ Streaming Responses</span>
       <span class="badge r">🔍 Document Preview</span>
+      <span class="badge c">🕷️ URL Web Crawling</span>
     </div>
   </div>
   <div class="g3" style="margin-top:20px;max-width:900px;">
@@ -639,11 +640,11 @@
       <p>ARIA auto-detects your language and replies in the same language — Tamil, Hindi, French, Arabic, and more.</p>
       <span class="accent ac-r">Auto-detect</span>
     </div>
-    <div class="feat-card" style="--fc:var(--emerald)">
-      <div class="fi">🌐</div>
-      <h3>Live Web Search</h3>
-      <p>Toggle real-time search to fetch today's information. ARIA uses live results to answer current-events questions.</p>
-      <span class="accent ac-g">Real-time Data</span>
+    <div class="feat-card" style="--fc:var(--cyan)">
+      <div class="fi">🕷️</div>
+      <h3>URL Web Crawling</h3>
+      <p>Paste any URL — ARIA crawls it up to 3 levels deep, extracts clean text, embeds it, and adds it to the knowledge base live.</p>
+      <span class="accent ac-c">BFS Crawler · SSE Progress</span>
     </div>
   </div>
 </div>
@@ -789,9 +790,65 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     SLIDE 8 — DOCUMENT FORMATS
+     SLIDE 8 — URL WEB CRAWLING
 ═══════════════════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s8">
+  <div class="tag">New · URL Web Crawling</div>
+  <h2>Ingest the web. <span class="grad2">One URL at a time.</span></h2>
+  <div class="flow" style="margin-top:20px;">
+    <div class="flow-box">
+      <div class="fi">🔗</div>
+      <h4>Paste URL</h4>
+      <p>Any public http/https page — docs, wikis, articles, company sites</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-box">
+      <div class="fi">🕷️</div>
+      <h4>BFS Crawl</h4>
+      <p>Depth 1–3 control. Follows same-domain links only. Max-pages cap prevents runaway crawls</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-box">
+      <div class="fi">🧹</div>
+      <h4>Clean Extract</h4>
+      <p>Trafilatura strips ads, nav, footers. BeautifulSoup fallback for JS-heavy sites</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-box">
+      <div class="fi">📡</div>
+      <h4>Live SSE Progress</h4>
+      <p>Each page streams a progress event — watch the crawl happen in real time</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-box">
+      <div class="fi">🗃️</div>
+      <h4>Into ChromaDB</h4>
+      <p>Chunked, embedded via Azure text-embedding-ada-002, stored with URL metadata</p>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;max-width:960px;width:100%;margin-top:18px;">
+    <div class="card" style="padding:16px 18px;">
+      <div style="font-size:22px;margin-bottom:8px;">⚙️</div>
+      <h3 style="font-size:14px;">Depth Control</h3>
+      <p style="font-size:12px;">Depth 1 = single page. Depth 2 = page + all its links. Depth 3 = two levels deep. Max 50 pages per crawl.</p>
+    </div>
+    <div class="card" style="padding:16px 18px;">
+      <div style="font-size:22px;margin-bottom:8px;">🛡️</div>
+      <h3 style="font-size:14px;">Smart Bot Protection</h3>
+      <p style="font-size:12px;">Known blocked sites (Twitter, LinkedIn, paywalls) are detected instantly and skipped with a clear error message — no wasted time.</p>
+    </div>
+    <div class="card" style="padding:16px 18px;">
+      <div style="font-size:22px;margin-bottom:8px;">📖</div>
+      <h3 style="font-size:14px;">Wikipedia Native API</h3>
+      <p style="font-size:12px;">Wikipedia URLs use the REST API directly — bypasses bot-blocking, gets clean article text without scraping.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SLIDE 9 — DOCUMENT FORMATS
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s9">
   <div class="tag">Document Intelligence</div>
   <h2>Upload anything.<br><span class="grad">Ask everything.</span></h2>
   <div class="fmt-grid" style="margin-top:24px;">
@@ -814,7 +871,7 @@
 <!-- ═══════════════════════════════════════════════════════════════════════════
      SLIDE 9 — HOW IT WORKS
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="slide" id="s9">
+<div class="slide" id="s10">
   <div class="tag">Under the Hood</div>
   <h2>Powered by <span class="grad">enterprise AI.</span> Kept simple.</h2>
   <div class="arch-row" style="margin-top:24px;">
@@ -824,7 +881,8 @@
       <p>Clean, fast browser UI — works on any device, no install required.</p>
       <div class="arch-item">Voice Input (Web Speech API)</div>
       <div class="arch-item">Live Web Toggle</div>
-      <div class="arch-item">Document Upload</div>
+      <div class="arch-item">Document Upload (10+ formats)</div>
+      <div class="arch-item c">🕷️ URL Crawl + SSE Progress</div>
       <div class="arch-item a">⚡ Streaming Bubble UI</div>
       <div class="arch-item a">🔍 Document Preview Panel</div>
     </div>
@@ -844,7 +902,7 @@
       <h3>📚 Vector Knowledge Base</h3>
       <p>ChromaDB stores documents as semantic vectors — meaning-based search.</p>
       <div class="arch-item c">Semantic similarity search</div>
-      <div class="arch-item c">All-MiniLM-L6 embeddings</div>
+      <div class="arch-item c">Azure text-embedding-ada-002</div>
       <div class="arch-item">Add / delete documents live</div>
       <div class="arch-item">Auto-watch folder for new files</div>
     </div>
@@ -857,7 +915,8 @@
       <div class="arch-item g">POST /api/chat/stream — SSE</div>
       <div class="arch-item">POST /api/converse — Chat</div>
       <div class="arch-item g">POST /api/converse/stream — SSE</div>
-      <div class="arch-item c">POST /api/ingest — Upload</div>
+      <div class="arch-item c">POST /api/ingest — File upload</div>
+      <div class="arch-item c">POST /api/ingest-url — Crawl SSE</div>
     </div>
   </div>
 </div>
@@ -865,7 +924,7 @@
 <!-- ═══════════════════════════════════════════════════════════════════════════
      SLIDE 10 — IMPACT & VALUE
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="slide" id="s10">
+<div class="slide" id="s11">
   <div class="tag">Business Value</div>
   <h2>Measurable impact <span class="grad">from day one.</span></h2>
   <div class="g4" style="margin-top:24px;">
@@ -905,14 +964,14 @@
 <!-- ═══════════════════════════════════════════════════════════════════════════
      SLIDE 11 — TECH STACK
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="slide" id="s11">
+<div class="slide" id="s12">
   <div class="tag">Technology Foundation</div>
   <h2>Enterprise-grade stack.<br><span class="grad">Production-ready.</span></h2>
   <div class="stack-row" style="margin-top:24px;">
     <div class="stack-col">
       <div class="stack-label">AI / Models</div>
       <div class="stack-item"><div class="si">🧠</div><div><div class="sn">Azure OpenAI</div><div class="sd">GPT-4o-mini · AsyncAzureOpenAI</div></div></div>
-      <div class="stack-item"><div class="si">🔢</div><div><div class="sn">Sentence Transformers</div><div class="sd">All-MiniLM-L6-v2 · Embeddings</div></div></div>
+      <div class="stack-item"><div class="si">🔢</div><div><div class="sn">Azure Embeddings</div><div class="sd">text-embedding-ada-002 · 1536-dim</div></div></div>
       <div class="stack-item"><div class="si">🌐</div><div><div class="sn">DuckDuckGo Search</div><div class="sd">Live web data · Privacy-first</div></div></div>
     </div>
     <div class="stack-col">
@@ -926,6 +985,7 @@
       <div class="stack-item"><div class="si">📕</div><div><div class="sn">PyMuPDF</div><div class="sd">PDF extraction · text + scanned</div></div></div>
       <div class="stack-item"><div class="si">📘</div><div><div class="sn">python-docx / openpyxl</div><div class="sd">Word · Excel · PowerPoint</div></div></div>
       <div class="stack-item"><div class="si">🔄</div><div><div class="sn">chardet</div><div class="sd">Auto encoding detection</div></div></div>
+      <div class="stack-item"><div class="si">🕷️</div><div><div class="sn">trafilatura + bs4</div><div class="sd">URL crawl · HTML clean extract</div></div></div>
     </div>
     <div class="stack-col">
       <div class="stack-label">Frontend</div>
@@ -939,7 +999,7 @@
 <!-- ═══════════════════════════════════════════════════════════════════════════
      SLIDE 12 — ROADMAP
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="slide" id="s12">
+<div class="slide" id="s13">
   <div class="tag">What's Next</div>
   <h2>Roadmap for <span class="grad">scale &amp; impact.</span></h2>
   <div class="timeline" style="margin-top:20px;">
@@ -953,7 +1013,7 @@
       </div>
       <div class="tl-right">
         <h3>Full Feature Launch <span class="now-badge">Live</span></h3>
-        <p>RAG mode, ARIA Chat, Voice I/O, Live Web Search, Neural TTS, 10+ document formats, multilingual support, <strong style="color:var(--cyan)">⚡ streaming responses, 🔍 document preview panel</strong>.</p>
+        <p>RAG mode, ARIA Chat, Voice I/O, Live Web Search, Neural TTS, 10+ document formats, multilingual support, <strong style="color:var(--cyan)">⚡ streaming responses, 🔍 document preview, 🕷️ URL web crawling with depth control &amp; SSE live progress</strong>.</p>
       </div>
     </div>
     <div class="tl-item">
@@ -1001,7 +1061,7 @@
 <!-- ═══════════════════════════════════════════════════════════════════════════
      SLIDE 13 — CALL TO ACTION
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="slide" id="s13">
+<div class="slide" id="s14">
   <div class="tag">Next Steps</div>
   <h2>Ready to <span class="grad">deploy ARIA</span><br>for your team?</h2>
   <div class="cta-grid">
@@ -1029,6 +1089,7 @@
     <div class="pill" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3);color:var(--amber);">🌐 Live Web Search</div>
     <div class="pill" style="background:rgba(14,165,233,.12);border-color:rgba(14,165,233,.3);color:var(--sky);">🔍 Document Preview</div>
     <div class="pill" style="background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.3);color:var(--purple);">🎤 Voice I/O</div>
+    <div class="pill" style="background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.3);color:var(--cyan);">🕷️ URL Web Crawling</div>
   </div>
 </div>
 
@@ -1037,7 +1098,7 @@
 <!-- Navigation -->
 <div class="nav">
   <button onclick="prevSlide()">‹</button>
-  <span class="slide-counter" id="counter">1 / 13</span>
+  <span class="slide-counter" id="counter">1 / 14</span>
   <button onclick="nextSlide()">›</button>
 </div>
 
