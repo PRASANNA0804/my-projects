@@ -18,6 +18,7 @@ striprtf>=0.0.26                  # .rtf Rich Text Format
 fastapi>=0.111.0
 uvicorn[standard]>=0.29.0
 python-multipart>=0.0.9           # file upload support
+gunicorn>=21.2.0             # production server for Azure
 
 # ── File watcher ─────────────────────────────────────────────────────────────
 watchdog>=4.0.0
