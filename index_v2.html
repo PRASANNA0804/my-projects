@@ -264,6 +264,12 @@ html,body { height:100%; overflow:hidden; background:var(--bg); color:var(--text
 
 /* SOURCE LIST */
 .src-list { display:flex; flex-direction:column; gap:5px; }
+.src-list::-webkit-scrollbar { width:3px; }
+.src-list::-webkit-scrollbar-track { background:transparent; }
+.src-list::-webkit-scrollbar-thumb { background:var(--rag-1); border-radius:3px; opacity:.7; }
+.src-list::-webkit-scrollbar-thumb:hover { background:var(--rose); }
+[data-theme="light"] .src-list::-webkit-scrollbar-thumb { background:rgba(245,158,11,.4); }
+[data-theme="light"] .src-list::-webkit-scrollbar-thumb:hover { background:var(--rose); }
 .src-item {
   display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:9px;
   border:1px solid var(--border); font-size:10.5px; cursor:default; position:relative; overflow:hidden;
@@ -1283,7 +1289,7 @@ kbd { padding:2px 6px; border-radius:4px; background:var(--bg-5); border:1px sol
         <div class="sec" style="margin-bottom:0">Knowledge Sources</div>
         <span style="font-size:8px;color:var(--text-3);font-family:'Space Mono',monospace" id="src-ct">0 files</span>
       </div>
-      <div class="src-list" id="src-list" style="overflow-y:auto;flex:1">
+      <div class="src-list" id="src-list" style="overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--rag-1) transparent">
         <div style="font-size:10px;color:var(--text-3);padding:10px 4px;font-family:'Space Mono',monospace;text-align:center">No documents yet</div>
       </div>
     </div>
@@ -2310,22 +2316,34 @@ async function crawlUrl(){
         let evt;
         try { evt = JSON.parse(line.slice(5).trim()); } catch{ continue; }
 
-        if(evt.type==='progress'){
+        if(evt.type==='debug'){
+          const short = (evt.url||'').replace(/^https?:\/\//,'').slice(0,50);
+          progText.textContent = `${evt.msg} ${short}`;
+        } else if(evt.type==='progress'){
           pagesIngested = evt.page;
           pf.style.width = Math.min(94, (evt.page / maxPages) * 100) + '%';
           const short = evt.url.replace(/^https?:\/\//,'').slice(0,45);
           progText.textContent = `Page ${evt.page} — ${short} (${evt.chunks} chunks)`;
           toast(`✔ ${short} — ${evt.chunks} chunks`, 'ok');
+        } else if(evt.type==='blocked'){
+          const site = (evt.url||'').replace(/^https?:\/\//,'').split('/')[0];
+          progText.textContent = `🚫 Blocked: ${evt.reason}`;
+          toast(`🚫 ${site} — ${evt.reason}`, 'err');
         } else if(evt.type==='skip'){
-          const short = (evt.url||'').replace(/^https?:\/\//,'').slice(0,45);
-          progText.textContent = `Skipped: ${short} — ${evt.reason||'unknown'}`;
+          const short = (evt.url||'').replace(/^https?:\/\//,'').slice(0,40);
+          const reason = evt.reason || 'unknown';
+          progText.textContent = `⏭ Skipped: ${short} — ${reason}`;
+          toast(`⏭ Skipped: ${reason}`, 'err');
         } else if(evt.type==='error'){
-          toast(`⚠ ${(evt.message||'').slice(0,80)}`, 'err');
-          progText.textContent = `Error: ${(evt.message||'').slice(0,80)}`;
+          const msg = (evt.message||'').slice(0,100);
+          toast(`⚠ Error: ${msg}`, 'err');
+          progText.textContent = `Error: ${msg}`;
         } else if(evt.type==='done'){
           pf.style.width = '100%';
-          progText.textContent = `Done — ${evt.pages_ingested} page${evt.pages_ingested!==1?'s':''}, ${evt.total_chunks} chunks ingested`;
-          toast(`🌐 Crawl complete — ${evt.pages_ingested} pages · ${evt.total_chunks} chunks`, 'ok');
+          const skippedNote = evt.pages_skipped ? ` (${evt.pages_skipped} skipped)` : '';
+          progText.textContent = `Done — ${evt.pages_ingested} page${evt.pages_ingested!==1?'s':''}, ${evt.total_chunks} chunks ingested${skippedNote}`;
+          const toastType = evt.pages_ingested > 0 ? 'ok' : 'err';
+          toast(`🌐 Crawl complete — ${evt.pages_ingested} pages · ${evt.total_chunks} chunks${skippedNote}`, toastType);
           checkHealth();
           setTimeout(()=>{ progWrap.style.display='none'; pf.style.width='0%'; }, 3000);
         }

@@ -197,10 +197,28 @@ async def crawl_and_ingest(url: str, depth: int = 2, max_pages: int = 10):
     parsed_start = urlparse(url)
     base_domain  = parsed_start.netloc
 
+    # Sites that cannot be crawled (login walls, JS challenges, bot blocks)
+    BLOCKED_DOMAINS: dict[str, str] = {
+        "twitter.com":        "Twitter/X (login required)",
+        "x.com":              "Twitter/X (login required)",
+        "linkedin.com":       "LinkedIn (login required)",
+        "facebook.com":       "Facebook (login required)",
+        "instagram.com":      "Instagram (login required)",
+        "tiktok.com":         "TikTok (bot detection)",
+        "reddit.com":         "Reddit (bot detection / API required)",
+        "nytimes.com":        "New York Times (paywall)",
+        "ft.com":             "Financial Times (paywall)",
+        "wsj.com":            "Wall Street Journal (paywall)",
+        "bloomberg.com":      "Bloomberg (paywall)",
+        "medium.com":         "Medium (metered paywall)",
+        "github.com":         "GitHub (use raw.githubusercontent.com for raw files)",
+    }
+
     visited: set  = set()
     queue         = [(url, 0)]   # (url, current_depth)
     pages_ingested = 0
     total_chunks   = 0
+    pages_skipped  = 0
 
     try:
         embed_client = get_embedding_client()
@@ -212,9 +230,18 @@ async def crawl_and_ingest(url: str, depth: int = 2, max_pages: int = 10):
     loop = asyncio.get_running_loop()
 
     async with httpx.AsyncClient(
-        timeout        = httpx.Timeout(12.0, connect=6.0),
+        timeout          = httpx.Timeout(20.0, connect=8.0),
         follow_redirects = True,
-        headers        = {"User-Agent": "ARIA-RAG-Crawler/1.0"},
+        verify           = False,   # skip SSL verify — avoids cert errors on some sites
+        headers          = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/124.0.0.0 Safari/537.36"
+            ),
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+        },
     ) as client:
         while queue and pages_ingested < max_pages:
             current_url, current_depth = queue.pop(0)
@@ -224,48 +251,122 @@ async def crawl_and_ingest(url: str, depth: int = 2, max_pages: int = 10):
                 continue
             visited.add(current_url)
 
-            # ── Fetch ──────────────────────────────────────────────────────────
-            try:
-                resp = await client.get(current_url)
-            except httpx.TimeoutException:
-                yield {"type": "skip", "url": current_url, "reason": "Timeout"}
-                continue
-            except Exception as exc:
-                yield {"type": "skip", "url": current_url, "reason": str(exc)}
-                continue
-
-            if resp.status_code != 200:
-                yield {"type": "skip", "url": current_url,
-                       "reason": f"HTTP {resp.status_code}"}
-                continue
-
-            ct = resp.headers.get("content-type", "")
-            if "text/html" not in ct:
-                yield {"type": "skip", "url": current_url, "reason": "Not HTML"}
-                continue
-
-            html = resp.text
-
-            # ── Extract clean text ─────────────────────────────────────────────
-            text = trafilatura.extract(
-                html,
-                include_links  = False,
-                include_images = False,
-                include_tables = True,
+            # ── Block known unsupported sites ──────────────────────────────────
+            cur_domain = urlparse(current_url).netloc.lower().removeprefix("www.")
+            blocked_reason = next(
+                (reason for domain, reason in BLOCKED_DOMAINS.items()
+                 if cur_domain == domain or cur_domain.endswith("." + domain)),
+                None
             )
-            # Fallback: BeautifulSoup visible-text when trafilatura gets nothing
-            # (handles JS-heavy SPAs, React/Next.js sites, etc.)
-            if not text or len(text.strip()) < 80:
-                try:
-                    soup_fb = BeautifulSoup(html, "html.parser")
-                    for tag in soup_fb(["script", "style", "nav", "footer", "header", "aside"]):
-                        tag.decompose()
-                    text = soup_fb.get_text(separator=" ", strip=True)
-                except Exception:
-                    text = None
-            if not text or len(text.strip()) < 80:
-                yield {"type": "skip", "url": current_url, "reason": "No content extracted"}
+            if blocked_reason:
+                pages_skipped += 1
+                yield {"type": "blocked", "url": current_url, "reason": blocked_reason}
                 continue
+
+            html = ""  # ensures html is always bound before link-collection block
+
+            # ── Wikipedia REST API (avoids 403 bot-blocking) ───────────────────
+            wp = urlparse(current_url)
+            is_wikipedia = wp.netloc.endswith("wikipedia.org") and wp.path.startswith("/wiki/")
+            if is_wikipedia:
+                page_title = wp.path.split("/wiki/", 1)[1]
+                # REST v1 /page/summary — fast, always JSON, no bot blocks
+                rest_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{page_title}"
+                yield {"type": "debug", "url": current_url, "msg": "Using Wikipedia REST API…"}
+                text = ""
+                try:
+                    rest_resp = await client.get(
+                        rest_url,
+                        headers={"Accept": "application/json; charset=utf-8;",
+                                 "User-Agent": "ARIA-RAG/1.0 (educational RAG project)"}
+                    )
+                    if rest_resp.status_code == 200:
+                        rest_data = rest_resp.json()
+                        text = rest_data.get("extract", "") or ""
+                        text = text.strip()
+                except Exception as exc:
+                    text = ""
+                    yield {"type": "debug", "url": current_url,
+                           "msg": f"REST summary failed ({exc}), trying action API…"}
+
+                # Fallback: action API (full article text, not just intro)
+                if not text or len(text) < 80:
+                    try:
+                        action_url = (
+                            f"https://en.wikipedia.org/w/api.php"
+                            f"?action=query&titles={page_title}"
+                            f"&prop=extracts&explaintext=true&exlimit=1&format=json"
+                            f"&origin=*"
+                        )
+                        action_resp = await client.get(
+                            action_url,
+                            headers={"User-Agent": "ARIA-RAG/1.0 (educational RAG project)"}
+                        )
+                        if action_resp.status_code == 200 and action_resp.text.strip():
+                            action_data = action_resp.json()
+                            for page_val in action_data.get("query", {}).get("pages", {}).values():
+                                text += page_val.get("extract", "") or ""
+                            text = text.strip()
+                    except Exception as exc2:
+                        pages_skipped += 1
+                        yield {"type": "skip", "url": current_url,
+                               "reason": f"Wikipedia API unavailable: {exc2}"}
+                        continue
+
+                if not text or len(text) < 80:
+                    pages_skipped += 1
+                    yield {"type": "skip", "url": current_url,
+                           "reason": "Wikipedia returned no content (page may not exist)"}
+                    continue
+            else:
+                # ── Regular fetch ──────────────────────────────────────────────
+                yield {"type": "debug", "url": current_url, "msg": "Fetching…"}
+                try:
+                    resp = await client.get(current_url)
+                except httpx.TimeoutException:
+                    pages_skipped += 1
+                    yield {"type": "skip", "url": current_url, "reason": "Timeout"}
+                    continue
+                except Exception as exc:
+                    pages_skipped += 1
+                    yield {"type": "skip", "url": current_url, "reason": str(exc)}
+                    continue
+
+                if resp.status_code != 200:
+                    pages_skipped += 1
+                    yield {"type": "skip", "url": current_url,
+                           "reason": f"HTTP {resp.status_code}"}
+                    continue
+
+                ct = resp.headers.get("content-type", "").lower()
+                if "text/html" not in ct:
+                    pages_skipped += 1
+                    yield {"type": "skip", "url": current_url,
+                           "reason": f"Not HTML (content-type: {ct[:60] or 'none'})"}
+                    continue
+
+                html = resp.text
+
+                # ── Extract clean text ─────────────────────────────────────────
+                text = trafilatura.extract(
+                    html,
+                    include_links  = False,
+                    include_images = False,
+                    include_tables = True,
+                )
+                # Fallback: BeautifulSoup visible-text
+                if not text or len(text.strip()) < 80:
+                    try:
+                        soup_fb = BeautifulSoup(html, "html.parser")
+                        for tag in soup_fb(["script", "style", "nav", "footer", "header", "aside"]):
+                            tag.decompose()
+                        text = soup_fb.get_text(separator=" ", strip=True)
+                    except Exception:
+                        text = None
+                if not text or len(text.strip()) < 80:
+                    pages_skipped += 1
+                    yield {"type": "skip", "url": current_url, "reason": "No content extracted"}
+                    continue
 
             # ── Chunk + embed + store (sync calls run in executor) ─────────────
             try:
@@ -297,7 +398,7 @@ async def crawl_and_ingest(url: str, depth: int = 2, max_pages: int = 10):
                 continue
 
             # ── Collect links for next depth level ─────────────────────────────
-            if current_depth < depth - 1:
+            if current_depth < depth - 1 and not is_wikipedia:
                 try:
                     soup = BeautifulSoup(html, "html.parser")
                     for a in soup.find_all("a", href=True):
@@ -315,7 +416,7 @@ async def crawl_and_ingest(url: str, depth: int = 2, max_pages: int = 10):
                     pass   # link extraction failure is non-fatal
 
     yield {"type": "done", "pages_ingested": pages_ingested,
-           "total_chunks": total_chunks}
+           "total_chunks": total_chunks, "pages_skipped": pages_skipped}
 
 
 if __name__ == "__main__":
