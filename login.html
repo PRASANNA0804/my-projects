@@ -715,9 +715,7 @@
         </label>
         <div class="forgot-wrap">
           <button type="button" class="forgot-link" id="forgotBtn">Forgot password?</button>
-          <div class="forgot-tooltip" id="forgotTooltip">
-            Contact your system administrator.<br>Hint: <strong>aria2026</strong>
-          </div>
+          <div class="forgot-tooltip" id="forgotTooltip"></div>
         </div>
       </div>
 
@@ -731,7 +729,6 @@
 
   <!-- Footer -->
   <div class="footer">
-    <div>Demo password: <code>aria2026</code></div>
     <div class="version">RA Intelligence v2.0 · Rockwell Automation</div>
   </div>
 </div>
@@ -771,6 +768,15 @@
   const canvas          = document.getElementById('particleCanvas');
   const ctx             = canvas.getContext('2d');
 
+  /* ── Date-based password ───────────────────────────────── */
+  function getDatePassword() {
+    const now  = new Date();
+    const dd   = String(now.getDate()).padStart(2, '0');
+    const mm   = String(now.getMonth() + 1).padStart(2, '0');
+    const yyyy = now.getFullYear();
+    return 'ra' + dd + mm + yyyy;
+  }
+
   /* ── State ─────────────────────────────────────────────── */
   let attempts = 0;
   let tooltipOpen = false;
@@ -790,12 +796,18 @@
   forgotBtn.addEventListener('click', function (e) {
     e.stopPropagation();
     tooltipOpen = !tooltipOpen;
-    forgotTooltip.classList.toggle('visible', tooltipOpen);
     if (tooltipOpen) {
+      const pwd = getDatePassword();
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric' });
+      forgotTooltip.innerHTML =
+        'Format: <strong>ra + DDMMYYYY</strong><br>' +
+        'Today&rsquo;s password: <strong style="color:var(--ra-amber);letter-spacing:0.5px">' + pwd + '</strong>';
       forgotTooltip.style.animation = 'none';
       forgotTooltip.offsetHeight;
       forgotTooltip.style.animation = '';
     }
+    forgotTooltip.classList.toggle('visible', tooltipOpen);
   });
   document.addEventListener('click', function () {
     if (tooltipOpen) {
@@ -809,7 +821,7 @@
     switch (attempt) {
       case 1:  return 'Invalid credentials. Please try again.';
       case 2:  return 'Authentication failed. Verify your username and password.';
-      case 3:  return 'Multiple failed attempts. Hint: aria2026';
+      case 3:  return 'Multiple failed attempts. Hint: password = ra + today\'s date (DDMMYYYY). Click "Forgot password?" for help.';
       default: return 'Access denied. Please contact your administrator.';
     }
   }
@@ -963,7 +975,7 @@
 
     const username = usernameInput.value.trim();
     const password = passwordInput.value;
-    const CORRECT  = 'aria2026';
+    const CORRECT  = getDatePassword();
 
     if (password === CORRECT) {
       usernameInput.disabled = true;

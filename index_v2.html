@@ -1405,7 +1405,7 @@ kbd { padding:2px 6px; border-radius:4px; background:var(--bg-5); border:1px sol
       <!-- File upload panel -->
       <div id="ingest-file-panel">
         <label class="uz" id="uz">
-          <input type="file" id="fi" multiple accept=".txt,.log,.md,.pdf,.docx,.xlsx,.pptx,.csv,.json,.rtf,.jpg,.jpeg,.png,.gif,.bmp,.webp"/>
+          <input type="file" id="fi" multiple accept=".txt,.log,.md,.pdf,.docx,.xlsx,.pptx,.csv,.json,.rtf,.jpg,.jpeg,.png,.gif,.bmp,.webp" onchange="uploadFiles(this.files)"/>
           <span class="u-ico">📂</span>
           <div class="u-tit">Drop files or click to browse</div>
           <div class="u-sub" id="u-sub">15 formats supported</div>
@@ -1626,6 +1626,7 @@ kbd { padding:2px 6px; border-radius:4px; background:var(--bg-5); border:1px sol
 /* ════════════════ STATE ════════════════════ */
 const API='http://localhost:8000/api';
 let mode='rag', msgCount=0, totalTok=0, chatHistory=[], currentTheme='dark';
+let _mid=0;
 let webSearchOn=false, autoReadOn=false;
 let _recognition=null, _voiceTranscript='';
 const _speakTexts={};
@@ -1828,6 +1829,29 @@ function updateSessCt(){
   });
 }
 
+/* ════════════════ COUNTS ════════════════════ */
+function updateCounts(){
+  const t=totalTok>999?(totalTok/1000).toFixed(1)+'k':String(totalTok);
+  const st=document.getElementById('s-tokens'); if(st) st.textContent=t;
+  const sm=document.getElementById('s-msgs');   if(sm) sm.textContent=msgCount;
+  const tt=document.getElementById('top-tok');  if(tt) tt.textContent=t;
+  const mc=document.getElementById('mc');       if(mc) mc.textContent=msgCount+' msg'+(msgCount!==1?'s':'');
+}
+
+/* ════════════════ ARIA CMD / SUGGESTION ════ */
+function ariaCmdFill(q){
+  const ta=document.getElementById('q');
+  ta.value=q; ta.dispatchEvent(new Event('input')); ta.focus();
+  const empty=document.getElementById('empty'); if(empty) empty.remove();
+  sendMsg();
+}
+function useSug(btn){
+  const ta=document.getElementById('q');
+  ta.value=btn.textContent; ta.dispatchEvent(new Event('input')); ta.focus();
+  const empty=document.getElementById('empty'); if(empty) empty.remove();
+  sendMsg();
+}
+
 function clearChat(){ if(window.speechSynthesis) window.speechSynthesis.cancel(); saveCurrentSession(); clearChatUI(true); }
 
 /* ════════════════ DELETE ════════════════════ */
@@ -1859,6 +1883,104 @@ async function uploadFiles(files){
   sub.textContent='16 formats supported';
   setTimeout(()=>{pb.classList.remove('show');pf.style.width='0%';},1100);
   document.getElementById('fi').value='';checkHealth();
+}
+
+/* ════════════════ SEND MESSAGE ════════════════════════════════════════════ */
+async function sendMsg(){
+  const ta=document.getElementById('q');
+  const send=document.getElementById('send');
+  const q=ta.value.trim();
+  if(!q||send.disabled) return;
+
+  /* Remove empty-state placeholder */
+  const empty=document.getElementById('empty'); if(empty) empty.remove();
+
+  /* Append user bubble */
+  const userEl=document.createElement('div');
+  userEl.className='msg user'; userEl.textContent=q;
+  const msgs=document.getElementById('msgs');
+  msgs.appendChild(userEl); msgs.scrollTop=msgs.scrollHeight;
+
+  /* Clear input */
+  ta.value=''; ta.style.height='auto';
+  ta.dispatchEvent(new Event('input'));
+
+  /* Snapshot history before this message (API appends current msg itself) */
+  const histSnap=[...chatHistory];
+  chatHistory.push({role:'user',content:q});
+  msgCount++; updateCounts();
+
+  const t0=Date.now();
+
+  if(mode==='rag'){
+    /* ── Document / RAG mode ── */
+    const topK=parseInt(document.getElementById('topk')?.value||'5',10);
+    const msgId=createStreamBubble('rag');
+    let full='', sources=[];
+    try{
+      const res=await fetch(`${API}/chat/stream`,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({question:q,top_k:topK})
+      });
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const reader=res.body.getReader(), dec=new TextDecoder();
+      let buf='';
+      while(true){
+        const {done,value}=await reader.read(); if(done) break;
+        buf+=dec.decode(value,{stream:true});
+        const lines=buf.split('\n'); buf=lines.pop();
+        for(const line of lines){
+          if(!line.startsWith('data:')) continue;
+          let evt; try{evt=JSON.parse(line.slice(5).trim());}catch(e){continue;}
+          if(evt.type==='sources')      { sources=evt.sources||[]; }
+          else if(evt.type==='token')   { full+=evt.token; updateStreamBubble(msgId,full); }
+          else if(evt.type==='no_docs') { full='No documents in the knowledge base yet. Please upload documents first, then ask your question.'; updateStreamBubble(msgId,full); }
+          else if(evt.type==='error')   { full='⚠ Error: '+(evt.message||'Unknown error'); updateStreamBubble(msgId,full); }
+        }
+      }
+    }catch(e){ full='⚠ Connection error: '+e.message; updateStreamBubble(msgId,full); }
+    totalTok+=Math.round((q.length+full.length)/4); updateCounts();
+    chatHistory.push({role:'assistant',content:full});
+    finalizeStreamBubble(msgId,full,{mode:'rag',sources,latency:Date.now()-t0});
+
+  }else{
+    /* ── Chat / RA Intelligence mode ── */
+    const msgId=createStreamBubble('chat');
+    let full='', webCtx=null;
+    if(webSearchOn){
+      try{
+        const ws=await fetch(`${API}/web-search?q=${encodeURIComponent(q)}&max_results=4`);
+        if(ws.ok){
+          const wd=await ws.json();
+          webCtx=(wd.results||[]).map(r=>`[${r.title}](${r.url})\n${r.snippet}`).join('\n\n')||null;
+        }
+      }catch(e){}
+    }
+    try{
+      const res=await fetch(`${API}/converse/stream`,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({message:q,history:histSnap.slice(-20),persona:currentPersona||'aria',web_context:webCtx})
+      });
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const reader=res.body.getReader(), dec=new TextDecoder();
+      let buf='';
+      while(true){
+        const {done,value}=await reader.read(); if(done) break;
+        buf+=dec.decode(value,{stream:true});
+        const lines=buf.split('\n'); buf=lines.pop();
+        for(const line of lines){
+          if(!line.startsWith('data:')) continue;
+          let evt; try{evt=JSON.parse(line.slice(5).trim());}catch(e){continue;}
+          if(evt.type==='token')  { full+=evt.token; updateStreamBubble(msgId,full); }
+          else if(evt.type==='error'){ full='⚠ Error: '+(evt.message||'Unknown error'); updateStreamBubble(msgId,full); }
+        }
+      }
+    }catch(e){ full='⚠ Connection error: '+e.message; updateStreamBubble(msgId,full); }
+    totalTok+=Math.round((q.length+full.length)/4); updateCounts();
+    chatHistory.push({role:'assistant',content:full});
+    finalizeStreamBubble(msgId,full,{mode:'chat',webUsed:!!webCtx});
+    setTimeout(()=>generateFollowUps(msgId),1500);
+  }
 }
 
 /* ════════════════ LOG FILE DETECTION ════════════════════════ */
@@ -2532,6 +2654,108 @@ function updateWakeBadge(on){
   b.classList.toggle('off',!on);
   b.title=on?'Wake word active — say "Hey RA" to open voice. Click to disable.':'Wake word disabled. Click to enable.';
 }
+
+/* ════════════════ HEALTH / DOC LIST ════════════════════════════════════════ */
+async function checkHealth(){
+  const led=document.getElementById('led2');
+  const sbStatus=document.getElementById('sb-status');
+  const sbLat=document.getElementById('sb-lat');
+  const sbLed=document.getElementById('sb-led');
+  function setStatus(ok,label,lat){
+    const cls=ok?'ok':'err';
+    if(led){led.className='led '+cls;}
+    if(sbLed){sbLed.className='led '+cls;}
+    if(sbStatus) sbStatus.textContent=label;
+    if(sbLat) sbLat.textContent=lat||'—';
+  }
+  const t0=Date.now();
+  try{
+    const r=await fetch(`${API}/stats`);
+    if(!r.ok){setStatus(false,'Offline','—');return;}
+    const d=await r.json();
+    const lat=((Date.now()-t0))+'ms';
+    const list=document.getElementById('src-list');
+    const ct=document.getElementById('src-ct');
+    setStatus(true,'Connected',lat);
+    if(!list) return;
+    const sources=d.sources||[];
+    ct.textContent=sources.length+' file'+(sources.length!==1?'s':'');
+    const sc=document.getElementById('s-chunks'); if(sc) sc.textContent=d.total_chunks||0;
+    const sd=document.getElementById('s-docs');   if(sd) sd.textContent=sources.length;
+    if(!sources.length){
+      list.innerHTML='<div style="font-size:10px;color:var(--text-3);padding:10px 4px;font-family:\'Space Mono\',monospace;text-align:center">No documents yet</div>';
+      return;
+    }
+    const em={pdf:'ep',docx:'ed',xlsx:'ex',pptx:'et',txt:'en',md:'em',csv:'ec',json:'ej',jpg:'ei',jpeg:'ei',png:'ei',gif:'ei',bmp:'ei',webp:'ei',log:'en'};
+    list.innerHTML=sources.map(s=>{
+      const ext=(s.extension||('.'+(s.name||'').split('.').pop())||'.txt').replace('.','').toLowerCase();
+      const cls=em[ext]||'en';
+      const name=s.name||'?';
+      const chunks=s.chunks||0;
+      return`<div class="src-item">
+        <span class="sext ${cls}">${ext.toUpperCase()}</span>
+        <span class="sname" title="${esc(name)}">${esc(name)}</span>
+        <span class="schunks">${chunks} chunk${chunks!==1?'s':''}</span>
+        <button class="sdel" onclick="confirmDel('${esc(name)}',event)">✕</button>
+      </div>`;
+    }).join('');
+  }catch(_){
+    const led=document.getElementById('led2');
+    const sbStatus=document.getElementById('sb-status');
+    const sbLed=document.getElementById('sb-led');
+    if(led){led.className='led err';}
+    if(sbLed){sbLed.className='led err';}
+    if(sbStatus) sbStatus.textContent='Offline';
+  }
+}
+
+/* ════════════════ DRAG & DROP ══════════════════════════════════════════════ */
+(function(){
+  const uz = document.getElementById('uz');
+  if(!uz) return;
+  uz.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    uz.classList.add('drag');
+  });
+  uz.addEventListener('dragleave', e => {
+    e.preventDefault();
+    uz.classList.remove('drag');
+  });
+  uz.addEventListener('drop', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    uz.classList.remove('drag');
+    const files = e.dataTransfer && e.dataTransfer.files;
+    if(files && files.length) uploadFiles(files);
+  });
+})();
+
+/* ── Textarea input wiring (enable/disable send, char count, auto-resize, Enter key) ── */
+(function(){
+  const ta=document.getElementById('q');
+  const send=document.getElementById('send');
+  const cc=document.getElementById('char-count');
+  if(!ta||!send) return;
+  function sync(){
+    const len=ta.value.trim().length;
+    send.disabled=len===0;
+    if(cc) cc.textContent=ta.value.length+' / 4000';
+    ta.style.height='auto';
+    ta.style.height=Math.min(ta.scrollHeight,160)+'px';
+  }
+  ta.addEventListener('input',sync);
+  ta.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&!e.shiftKey){
+      e.preventDefault();
+      if(!send.disabled) sendMsg();
+    }
+  });
+  sync();
+})();
+
+/* load existing documents on startup */
+checkHealth();
 </script>
 </body>
 </html>
