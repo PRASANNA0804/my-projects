@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>ARIA — AI Knowledge Assistant | Leadership Deck</title>
+<title>RA Intelligence — Rockwell Automation AI Platform | Leadership Deck</title>
 <style>
   :root{
-    --indigo:#6366f1;--purple:#8b5cf6;--violet:#7c3aed;
+    --ra-red:#CC0000;--ra-dark:#8B0000;--ra-orange:#E05000;--ra-amber:#FF8C00;
     --emerald:#10b981;--cyan:#06b6d4;--rose:#f43f5e;
-    --amber:#f59e0b;--sky:#0ea5e9;
+    --amber:#f59e0b;--sky:#0ea5e9;--indigo:#6366f1;--purple:#8b5cf6;
     --dark:#0d0f17;--card:#161927;--card2:#1e2235;
     --text:#e8eaf6;--muted:#8892b0;--white:#fff;
   }
@@ -49,22 +49,22 @@
     position:fixed;bottom:32px;left:50%;transform:translateX(-50%);
     display:flex;gap:12px;align-items:center;z-index:100;
     background:rgba(22,25,39,.9);backdrop-filter:blur(20px);
-    border:1px solid rgba(99,102,241,.3);border-radius:40px;padding:10px 20px;
+    border:1px solid rgba(204,0,0,.3);border-radius:40px;padding:10px 20px;
     box-shadow:0 8px 32px rgba(0,0,0,.4);
   }
   .nav button{
     background:none;border:none;color:var(--muted);font-size:20px;
     cursor:pointer;padding:4px 10px;border-radius:20px;transition:.2s;
   }
-  .nav button:hover{color:var(--white);background:rgba(99,102,241,.25);transform:scale(1.1);}
+  .nav button:hover{color:var(--white);background:rgba(204,0,0,.25);transform:scale(1.1);}
   .slide-counter{color:var(--muted);font-size:13px;min-width:48px;text-align:center;}
   .progress{
     position:fixed;top:0;left:0;height:3px;
-    background:linear-gradient(90deg,var(--indigo),var(--purple),var(--cyan),var(--emerald));
+    background:linear-gradient(90deg,var(--ra-amber),var(--ra-orange),var(--ra-red),var(--ra-dark));
     background-size:200% 100%;
     transition:width .45s cubic-bezier(.16,1,.3,1);z-index:200;
     animation:shimmerBar 3s linear infinite;
-    box-shadow:0 0 8px rgba(99,102,241,.6);
+    box-shadow:0 0 8px rgba(204,0,0,.6);
   }
   @keyframes shimmerBar{0%{background-position:200% 0}100%{background-position:-200% 0}}
   .dot-nav{
@@ -75,23 +75,23 @@
     width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.18);
     cursor:pointer;transition:.25s;
   }
-  .dot.active{background:var(--indigo);transform:scale(1.5);box-shadow:0 0 8px var(--indigo);}
-  .dot:hover:not(.active){background:rgba(99,102,241,.5);transform:scale(1.2);}
+  .dot.active{background:var(--ra-red);transform:scale(1.5);box-shadow:0 0 8px var(--ra-red);}
+  .dot:hover:not(.active){background:rgba(204,0,0,.5);transform:scale(1.2);}
 
   /* ── SHARED COMPONENTS ─────────────────────────────────────────────────── */
   .tag{
     display:inline-block;font-size:11px;font-weight:700;letter-spacing:1.5px;
     text-transform:uppercase;padding:4px 12px;border-radius:20px;
-    background:rgba(99,102,241,.15);color:var(--indigo);border:1px solid rgba(99,102,241,.3);
+    background:rgba(204,0,0,.15);color:var(--ra-red);border:1px solid rgba(204,0,0,.3);
     margin-bottom:18px;
     animation:pulse-tag 2.5s ease-in-out infinite;
   }
-  @keyframes pulse-tag{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.3)}50%{box-shadow:0 0 0 6px rgba(99,102,241,0)}}
+  @keyframes pulse-tag{0%,100%{box-shadow:0 0 0 0 rgba(204,0,0,.3)}50%{box-shadow:0 0 0 6px rgba(204,0,0,0)}}
   h1{font-size:clamp(36px,5vw,68px);font-weight:800;line-height:1.08;text-align:center;}
   h2{font-size:clamp(26px,3.8vw,50px);font-weight:800;line-height:1.1;text-align:center;margin-bottom:12px;}
   h3{font-size:20px;font-weight:700;margin-bottom:8px;}
   .sub{font-size:clamp(14px,1.8vw,20px);color:var(--muted);text-align:center;max-width:760px;line-height:1.6;}
-  .grad{background:linear-gradient(135deg,var(--indigo),var(--purple),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .grad{background:linear-gradient(135deg,var(--ra-amber),var(--ra-orange),var(--ra-red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
   .grad2{background:linear-gradient(135deg,var(--emerald),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
   .grad3{background:linear-gradient(135deg,var(--amber),var(--rose));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 
@@ -108,11 +108,11 @@
   }
   .card::before{
     content:'';position:absolute;inset:0;border-radius:16px;
-    background:linear-gradient(135deg,rgba(99,102,241,.06),transparent);
+    background:linear-gradient(135deg,rgba(204,0,0,.06),transparent);
     opacity:0;transition:.3s;
   }
   .card:hover::before{opacity:1;}
-  .card:hover{border-color:rgba(99,102,241,.5);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.3);}
+  .card:hover{border-color:rgba(204,0,0,.5);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.3);}
   .card p{color:var(--muted);font-size:14px;line-height:1.6;margin-top:6px;}
   .icon{font-size:32px;margin-bottom:12px;}
 
@@ -135,23 +135,29 @@
   }
   .pill:hover{background:rgba(255,255,255,.1);transform:translateY(-1px);}
 
-  /* ── SLIDE 1 — HERO ─────────────────────────────────────────────────────── */
-  #s1{background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(99,102,241,.22) 0%,transparent 70%),var(--dark);}
-  #s1 .orb{
-    width:180px;height:180px;border-radius:50%;margin-bottom:32px;
-    background:conic-gradient(from 0deg,var(--indigo),var(--purple),var(--cyan),var(--emerald),var(--indigo));
-    display:flex;align-items:center;justify-content:center;font-size:72px;
-    box-shadow:0 0 80px rgba(99,102,241,.5),0 0 120px rgba(99,102,241,.2);
-    animation:spin 8s linear infinite;
+  /* ── SLIDE 1 — HERO (RA logo) ───────────────────────────────────────────── */
+  #s1{background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(204,0,0,.20) 0%,transparent 70%),var(--dark);}
+
+  .ra-hero-logo{
+    margin-bottom:28px;
+    filter:drop-shadow(0 6px 44px rgba(204,0,0,.75));
+    animation:raPresentFloat 4s ease-in-out infinite;
+    will-change:transform;
   }
-  @keyframes spin{to{transform:rotate(360deg);}}
-  #s1 .orb-inner{
-    width:156px;height:156px;border-radius:50%;
-    background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:68px;
-    animation:spin 8s linear infinite reverse;
+  @keyframes raPresentFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+  .ra-shine-pres{
+    transform-box:fill-box;
+    animation:raShineP 3s linear infinite;
+    animation-delay:.5s;
+    will-change:transform;
   }
+  @keyframes raShineP{
+    0%  {transform:skewX(-15deg) translateX(-160px);}
+    100%{transform:skewX(-15deg) translateX(320px);}
+  }
+
   #s1 .byline{margin-top:28px;font-size:14px;color:var(--muted);}
-  #s1 .byline strong{color:var(--purple);}
+  #s1 .byline strong{color:var(--ra-orange);}
   .version-badge{
     display:inline-flex;align-items:center;gap:6px;
     background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);
@@ -175,16 +181,16 @@
   /* ── SLIDE 3 — SOLUTION ─────────────────────────────────────────────────── */
   #s3{background:radial-gradient(ellipse 60% 50% at 80% 50%,rgba(16,185,129,.08) 0%,transparent 70%),var(--dark);}
   .sol-hero{
-    background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(16,185,129,.08));
-    border:1px solid rgba(99,102,241,.2);border-radius:20px;
+    background:linear-gradient(135deg,rgba(204,0,0,.10),rgba(16,185,129,.08));
+    border:1px solid rgba(204,0,0,.2);border-radius:20px;
     padding:28px 40px;max-width:880px;text-align:center;
-    box-shadow:0 0 60px rgba(99,102,241,.08);
+    box-shadow:0 0 60px rgba(204,0,0,.08);
   }
   .sol-hero .quote{font-size:clamp(16px,2.2vw,24px);font-weight:700;line-height:1.4;margin-bottom:20px;}
   .sol-badges{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
   .badge{
     padding:7px 16px;border-radius:30px;font-size:12px;font-weight:700;
-    background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:var(--indigo);
+    background:rgba(204,0,0,.12);border:1px solid rgba(204,0,0,.3);color:var(--ra-red);
     transition:.2s;
   }
   .badge:hover{transform:translateY(-2px);}
@@ -202,11 +208,11 @@
   }
   .feat-card::after{
     content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
-    background:linear-gradient(90deg,transparent,var(--fc,var(--indigo)),transparent);
+    background:linear-gradient(90deg,transparent,var(--fc,var(--ra-red)),transparent);
     transform:translateX(-100%);transition:.4s;
   }
   .feat-card:hover::after{transform:translateX(0);}
-  .feat-card:hover{border-color:rgba(99,102,241,.4);transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.25);}
+  .feat-card:hover{border-color:rgba(204,0,0,.4);transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.25);}
   .feat-card .fi{font-size:26px;}
   .feat-card h3{font-size:15px;}
   .feat-card p{color:var(--muted);font-size:12px;line-height:1.5;}
@@ -221,9 +227,10 @@
   .ac-r{background:rgba(244,63,94,.15);color:var(--rose);}
   .ac-p{background:rgba(139,92,246,.15);color:var(--purple);}
   .ac-s{background:rgba(14,165,233,.15);color:var(--sky);}
+  .ac-ra{background:rgba(204,0,0,.15);color:var(--ra-red);}
 
   /* ── SLIDE 5 — STREAMING DEMO ───────────────────────────────────────────── */
-  #s5{background:radial-gradient(ellipse 60% 50% at 20% 50%,rgba(99,102,241,.1) 0%,transparent 70%),
+  #s5{background:radial-gradient(ellipse 60% 50% at 20% 50%,rgba(204,0,0,.08) 0%,transparent 70%),
        radial-gradient(ellipse 60% 50% at 80% 50%,rgba(6,182,212,.08) 0%,transparent 70%),var(--dark);}
 
   .stream-flow{display:flex;align-items:center;gap:0;max-width:980px;width:100%;margin-top:20px;}
@@ -239,35 +246,36 @@
 
   /* Live typing demo */
   .typing-demo{
-    background:rgba(22,25,39,.9);border:1px solid rgba(99,102,241,.2);
+    background:rgba(22,25,39,.9);border:1px solid rgba(204,0,0,.2);
     border-radius:16px;padding:20px 28px;max-width:860px;width:100%;margin-top:12px;
     font-size:14px;color:var(--text);line-height:1.8;
   }
   .typing-demo .sse-label{
     font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
-    color:var(--cyan);margin-bottom:10px;display:flex;align-items:center;gap:6px;
+    color:var(--ra-orange);margin-bottom:10px;display:flex;align-items:center;gap:6px;
   }
-  .sse-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:blink .8s infinite;}
+  .sse-dot{width:6px;height:6px;border-radius:50%;background:var(--ra-red);animation:blink .8s infinite;}
   @keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
   .token-stream{font-family:monospace;font-size:13px;color:var(--text);}
-  .cursor{display:inline-block;width:9px;height:16px;background:var(--indigo);border-radius:1px;
+  .cursor{display:inline-block;width:9px;height:16px;background:var(--ra-red);border-radius:1px;
     vertical-align:text-bottom;animation:cur .7s step-end infinite;}
   @keyframes cur{0%,100%{opacity:1;}50%{opacity:0;}}
 
   /* ── SLIDE 6 — VOICE ────────────────────────────────────────────────────── */
-  #s6{background:radial-gradient(ellipse 70% 60% at 50% 40%,rgba(139,92,246,.12) 0%,transparent 70%),var(--dark);}
+  #s6{background:radial-gradient(ellipse 70% 60% at 50% 40%,rgba(204,0,0,.10) 0%,transparent 70%),var(--dark);}
   .voice-demo{
     display:flex;flex-direction:column;align-items:center;gap:20px;
-    background:var(--card);border:1px solid rgba(139,92,246,.25);border-radius:24px;
+    background:var(--card);border:1px solid rgba(204,0,0,.25);border-radius:24px;
     padding:32px 50px;
   }
   .vo-orb-demo{
     width:96px;height:96px;border-radius:50%;
-    background:conic-gradient(var(--purple),var(--indigo),var(--cyan),var(--purple));
+    background:conic-gradient(var(--ra-amber),var(--ra-orange),var(--ra-red),var(--ra-amber));
     display:flex;align-items:center;justify-content:center;font-size:38px;
-    box-shadow:0 0 50px rgba(139,92,246,.5);
+    box-shadow:0 0 50px rgba(204,0,0,.5);
     animation:spin 6s linear infinite;
   }
+  @keyframes spin{to{transform:rotate(360deg);}}
   .vo-inner{
     width:82px;height:82px;border-radius:50%;background:var(--card);
     display:flex;align-items:center;justify-content:center;font-size:36px;
@@ -276,7 +284,7 @@
   .waves{display:flex;gap:5px;align-items:center;height:36px;}
   .w-bar{
     width:5px;border-radius:3px;
-    background:linear-gradient(to top,var(--purple),var(--cyan));
+    background:linear-gradient(to top,var(--ra-red),var(--ra-amber));
     animation:wv .8s ease-in-out infinite alternate;
   }
   .w-bar:nth-child(1){animation-delay:0s;height:12px;}
@@ -289,14 +297,14 @@
   @keyframes wv{to{transform:scaleY(.22);}}
   .voice-points{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:680px;width:100%;}
   .vp{
-    background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);
+    background:rgba(204,0,0,.08);border:1px solid rgba(204,0,0,.18);
     border-radius:12px;padding:12px 16px;display:flex;gap:10px;align-items:flex-start;
     transition:.2s;
   }
-  .vp:hover{background:rgba(139,92,246,.14);transform:translateY(-1px);}
+  .vp:hover{background:rgba(204,0,0,.14);transform:translateY(-1px);}
   .vp .vpi{font-size:18px;}
   .vp .vpt{font-size:12px;color:var(--text);line-height:1.5;}
-  .vp .vpt strong{color:var(--purple);}
+  .vp .vpt strong{color:var(--ra-orange);}
 
   /* ── SLIDE 7 — WEB SEARCH ───────────────────────────────────────────────── */
   #s7{background:radial-gradient(ellipse 70% 60% at 30% 50%,rgba(16,185,129,.08) 0%,transparent 70%),var(--dark);}
@@ -321,8 +329,11 @@
     color:var(--emerald);margin-bottom:8px;
   }
 
-  /* ── SLIDE 8 — DOC FORMATS ──────────────────────────────────────────────── */
+  /* ── SLIDE 8 — URL CRAWLING ─────────────────────────────────────────────── */
   #s8{background:var(--dark);}
+
+  /* ── SLIDE 9 — DOC FORMATS ──────────────────────────────────────────────── */
+  #s9{background:var(--dark);}
   .fmt-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-width:860px;width:100%;}
   .fmt-box{
     background:var(--card);border:1px solid rgba(255,255,255,.07);
@@ -331,22 +342,22 @@
   }
   .fmt-box::before{
     content:'';position:absolute;inset:0;
-    background:linear-gradient(135deg,rgba(99,102,241,.08),transparent);
+    background:linear-gradient(135deg,rgba(204,0,0,.08),transparent);
     opacity:0;transition:.28s;
   }
   .fmt-box:hover::before{opacity:1;}
-  .fmt-box:hover{border-color:var(--indigo);transform:translateY(-5px);box-shadow:0 10px 28px rgba(0,0,0,.25);}
+  .fmt-box:hover{border-color:var(--ra-red);transform:translateY(-5px);box-shadow:0 10px 28px rgba(0,0,0,.25);}
   .fmt-box .fi{font-size:28px;margin-bottom:6px;}
-  .fmt-box .ext{font-size:11px;font-weight:700;letter-spacing:.8px;color:var(--indigo);}
+  .fmt-box .ext{font-size:11px;font-weight:700;letter-spacing:.8px;color:var(--ra-red);}
   .fmt-box .name{font-size:10px;color:var(--muted);margin-top:2px;}
   .fmt-note{
     margin-top:16px;font-size:13px;color:var(--muted);
-    background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.15);
+    background:rgba(204,0,0,.07);border:1px solid rgba(204,0,0,.15);
     border-radius:10px;padding:10px 20px;
   }
 
-  /* ── SLIDE 9 — HOW IT WORKS ─────────────────────────────────────────────── */
-  #s9{background:var(--dark);}
+  /* ── SLIDE 10 — HOW IT WORKS ────────────────────────────────────────────── */
+  #s10{background:var(--dark);}
   .arch-row{display:flex;align-items:stretch;gap:0;max-width:1060px;width:100%;}
   .arch-col{
     flex:1;background:var(--card);border:1px solid rgba(255,255,255,.07);
@@ -354,7 +365,7 @@
   }
   .arch-col:first-child{border-radius:16px 0 0 16px;}
   .arch-col:last-child{border-radius:0 16px 16px 0;}
-  .arch-col:hover{background:var(--card2);border-color:rgba(99,102,241,.3);}
+  .arch-col:hover{background:var(--card2);border-color:rgba(204,0,0,.3);}
   .arch-col .layer-label{
     font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
     color:var(--muted);margin-bottom:2px;
@@ -362,21 +373,24 @@
   .arch-col h3{font-size:14px;}
   .arch-col p{color:var(--muted);font-size:11px;line-height:1.5;}
   .arch-sep{
-    width:2px;background:linear-gradient(to bottom,transparent,var(--indigo),transparent);
+    width:2px;background:linear-gradient(to bottom,transparent,var(--ra-red),transparent);
     flex-shrink:0;
   }
   .arch-item{
-    background:rgba(99,102,241,.07);border-radius:7px;padding:7px 10px;
-    font-size:11px;color:var(--text);border-left:3px solid var(--indigo);
+    background:rgba(204,0,0,.07);border-radius:7px;padding:7px 10px;
+    font-size:11px;color:var(--text);border-left:3px solid var(--ra-red);
     margin-top:3px;transition:.2s;
   }
-  .arch-item:hover{background:rgba(99,102,241,.14);}
-  .arch-item.g{border-color:var(--emerald);}
-  .arch-item.c{border-color:var(--cyan);}
-  .arch-item.a{border-color:var(--amber);}
+  .arch-item:hover{background:rgba(204,0,0,.14);}
+  .arch-item.g{border-color:var(--emerald);background:rgba(16,185,129,.07);}
+  .arch-item.g:hover{background:rgba(16,185,129,.14);}
+  .arch-item.c{border-color:var(--cyan);background:rgba(6,182,212,.07);}
+  .arch-item.c:hover{background:rgba(6,182,212,.14);}
+  .arch-item.a{border-color:var(--amber);background:rgba(245,158,11,.07);}
+  .arch-item.a:hover{background:rgba(245,158,11,.14);}
 
-  /* ── SLIDE 10 — IMPACT ──────────────────────────────────────────────────── */
-  #s10{background:radial-gradient(ellipse 70% 50% at 50% 30%,rgba(6,182,212,.08) 0%,transparent 70%),var(--dark);}
+  /* ── SLIDE 11 — IMPACT ──────────────────────────────────────────────────── */
+  #s11{background:radial-gradient(ellipse 70% 50% at 50% 30%,rgba(204,0,0,.07) 0%,transparent 70%),var(--dark);}
   .impact-stat{
     background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:18px;
     padding:28px 18px;text-align:center;position:relative;overflow:hidden;transition:.3s;
@@ -385,21 +399,21 @@
   .impact-stat::before{
     content:'';position:absolute;top:0;left:0;right:0;height:3px;
   }
-  .impact-stat.i1::before{background:linear-gradient(90deg,var(--indigo),var(--purple));}
+  .impact-stat.i1::before{background:linear-gradient(90deg,var(--ra-amber),var(--ra-orange));}
   .impact-stat.i2::before{background:linear-gradient(90deg,var(--emerald),var(--cyan));}
   .impact-stat.i3::before{background:linear-gradient(90deg,var(--amber),var(--rose));}
-  .impact-stat.i4::before{background:linear-gradient(90deg,var(--sky),var(--indigo));}
+  .impact-stat.i4::before{background:linear-gradient(90deg,var(--ra-orange),var(--ra-red));}
   .impact-num{font-size:52px;font-weight:900;line-height:1;}
   .impact-lbl{color:var(--muted);font-size:12px;margin-top:8px;line-height:1.5;}
   .impact-detail{
-    margin-top:24px;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.15);
+    margin-top:24px;background:rgba(204,0,0,.05);border:1px solid rgba(204,0,0,.15);
     border-radius:14px;padding:16px 28px;max-width:860px;width:100%;
   }
   .impact-detail p{font-size:14px;color:var(--muted);line-height:1.7;text-align:center;}
-  .impact-detail strong{color:var(--cyan);}
+  .impact-detail strong{color:var(--ra-orange);}
 
-  /* ── SLIDE 11 — TECH STACK ──────────────────────────────────────────────── */
-  #s11{background:var(--dark);}
+  /* ── SLIDE 12 — TECH STACK ──────────────────────────────────────────────── */
+  #s12{background:var(--dark);}
   .stack-row{display:flex;gap:14px;width:100%;max-width:1000px;}
   .stack-col{flex:1;display:flex;flex-direction:column;gap:8px;}
   .stack-label{
@@ -411,13 +425,13 @@
     padding:9px 12px;display:flex;align-items:center;gap:10px;
     font-size:12px;transition:.2s;
   }
-  .stack-item:hover{border-color:rgba(99,102,241,.3);background:var(--card2);transform:translateX(2px);}
+  .stack-item:hover{border-color:rgba(204,0,0,.3);background:var(--card2);transform:translateX(2px);}
   .stack-item .si{font-size:16px;}
   .stack-item .sn{font-weight:700;font-size:12px;}
   .stack-item .sd{font-size:10px;color:var(--muted);}
 
-  /* ── SLIDE 12 — ROADMAP ─────────────────────────────────────────────────── */
-  #s12{background:var(--dark);}
+  /* ── SLIDE 13 — ROADMAP ─────────────────────────────────────────────────── */
+  #s13{background:var(--dark);}
   .timeline{display:flex;flex-direction:column;gap:0;max-width:820px;width:100%;}
   .tl-item{display:flex;gap:0;position:relative;}
   .tl-left{
@@ -443,11 +457,11 @@
   }
   .now-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--emerald);animation:blink .8s infinite;}
 
-  /* ── SLIDE 13 — CTA ─────────────────────────────────────────────────────── */
-  #s13{
+  /* ── SLIDE 14 — CTA ─────────────────────────────────────────────────────── */
+  #s14{
     background:
-      radial-gradient(ellipse 80% 60% at 50% 0%,rgba(99,102,241,.25) 0%,transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 100%,rgba(16,185,129,.12) 0%,transparent 60%),
+      radial-gradient(ellipse 80% 60% at 50% 0%,rgba(204,0,0,.22) 0%,transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 100%,rgba(16,185,129,.10) 0%,transparent 60%),
       var(--dark);
   }
   .cta-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;width:100%;max-width:900px;margin:24px 0;}
@@ -455,16 +469,16 @@
     background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;
     padding:22px 18px;text-align:center;transition:.3s;
   }
-  .cta-item:hover{border-color:rgba(99,102,241,.4);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.25);}
+  .cta-item:hover{border-color:rgba(204,0,0,.4);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.25);}
   .cta-item .ci{font-size:30px;margin-bottom:10px;}
   .cta-item h3{font-size:14px;margin-bottom:5px;}
   .cta-item p{font-size:12px;color:var(--muted);line-height:1.5;}
   .creator{
     margin-top:18px;font-size:13px;color:var(--muted);
-    background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);
+    background:rgba(204,0,0,.08);border:1px solid rgba(204,0,0,.2);
     border-radius:10px;padding:10px 24px;
   }
-  .creator strong{color:var(--purple);}
+  .creator strong{color:var(--ra-orange);}
 
   /* responsiveness */
   @media(max-width:900px){
@@ -500,17 +514,42 @@
 <div class="deck">
 
 <div class="slide active" id="s1">
-  <div class="orb"><div class="orb-inner">🤖</div></div>
-  <div class="tag">Internal Platform · 2026</div>
-  <h1><span class="grad">ARIA</span></h1>
+  <!-- RA Hexagonal Logo -->
+  <div class="ra-hero-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="148" height="148">
+      <defs>
+        <linearGradient id="raGradP" x1="0%" y1="0%" x2="100%" y2="110%">
+          <stop offset="0%" stop-color="#FF8C00"/>
+          <stop offset="28%" stop-color="#D83000"/>
+          <stop offset="100%" stop-color="#CC0000"/>
+        </linearGradient>
+        <linearGradient id="raSheenP" x1="0%" y1="0%" x2="80%" y2="80%">
+          <stop offset="0%" stop-color="rgba(255,255,255,0.35)"/>
+          <stop offset="55%" stop-color="rgba(255,255,255,0)"/>
+        </linearGradient>
+        <clipPath id="raClipP">
+          <path d="M80 10 L130 24 L150 80 L130 136 L80 150 L30 136 L10 80 L30 24 Z"/>
+        </clipPath>
+      </defs>
+      <path d="M80 10 L130 24 L150 80 L130 136 L80 150 L30 136 L10 80 L30 24 Z" fill="url(#raGradP)"/>
+      <path d="M80 10 L130 24 L150 80 L130 136 L80 150 L30 136 L10 80 L30 24 Z" fill="url(#raSheenP)"/>
+      <rect class="ra-shine-pres" x="0" y="0" width="90" height="160"
+            fill="rgba(255,255,255,0.20)" clip-path="url(#raClipP)"/>
+      <text x="80" y="104" text-anchor="middle"
+        font-family="'Arial Black',Impact,'Helvetica Neue',sans-serif"
+        font-weight="900" font-size="60" fill="white" letter-spacing="-2">RA</text>
+    </svg>
+  </div>
+  <div class="tag">Rockwell Automation · Internal Platform · 2026</div>
+  <h1><span class="grad">RA Intelligence</span></h1>
   <h1 style="font-size:clamp(16px,2.2vw,28px);font-weight:500;color:var(--muted);margin-top:6px;">
-    Amazingly Ridiculous Intelligent Assistant
+    Rockwell Automation AI Knowledge Platform
   </h1>
   <p class="sub" style="margin-top:16px;">
-    An enterprise-grade AI knowledge platform — turns your documents into instant answers,<br>
-    streams responses live, previews sources on click, speaks every language, and knows what's happening right now.
+    An enterprise-grade AI platform — turns your documents into instant cited answers,<br>
+    streams responses live, analyzes log files, previews sources, speaks every language, and knows what's happening right now.
   </p>
-  <div class="version-badge">⚡ v2.1 — Now with URL Crawling · Streaming · Document Preview</div>
+  <div class="version-badge">⚡ v2.1 — Streaming · Document Preview · URL Crawling · Log File Analysis</div>
   <p class="byline" style="margin-top:18px;">Built by <strong>Prasanna</strong> &nbsp;·&nbsp; Powered by Azure OpenAI GPT-4o-mini</p>
 </div>
 
@@ -560,7 +599,7 @@
   <div class="tag">The Solution</div>
   <h2>One platform. <span class="grad">Every answer.</span></h2>
   <div class="sol-hero" style="margin-top:20px;">
-    <div class="quote">"Ask anything — from your documents, from the web,<br>or just have a conversation — in any language, with your voice.<br><em style="color:var(--cyan);font-style:normal;">Watch the answer stream live, token by token.</em>"</div>
+    <div class="quote">"Ask anything — from your documents, from the web,<br>or just have a conversation — in any language, with your voice.<br><em style="color:var(--ra-amber);font-style:normal;">Watch the answer stream live, token by token.</em>"</div>
     <div class="sol-badges">
       <span class="badge">📚 Document Intelligence</span>
       <span class="badge g">🌐 Live Web Search</span>
@@ -570,6 +609,7 @@
       <span class="badge g">⚡ Streaming Responses</span>
       <span class="badge r">🔍 Document Preview</span>
       <span class="badge c">🕷️ URL Web Crawling</span>
+      <span class="badge">📋 Log File Analysis</span>
     </div>
   </div>
   <div class="g3" style="margin-top:20px;max-width:900px;">
@@ -580,8 +620,8 @@
     </div>
     <div class="card" style="text-align:center;">
       <div class="icon">💬</div>
-      <h3 class="grad2">Chat Mode</h3>
-      <p>ARIA — a brilliant, funny, multilingual assistant. Responses stream word-by-word in real time.</p>
+      <h3 class="grad2">RA Chat</h3>
+      <p>RA Intelligence — a brilliant, multilingual AI assistant. Responses stream word-by-word in real time.</p>
     </div>
     <div class="card" style="text-align:center;">
       <div class="icon">🔴</div>
@@ -598,11 +638,11 @@
   <div class="tag">Key Features</div>
   <h2>Built for <span class="grad">real work.</span> Designed for <span class="grad2">real people.</span></h2>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:1100px;width:100%;margin-top:20px;">
-    <div class="feat-card" style="--fc:var(--indigo)">
+    <div class="feat-card" style="--fc:var(--ra-red)">
       <div class="fi">📄</div>
       <h3>Multi-Format Ingestion</h3>
-      <p>Upload PDF, Word, Excel, PowerPoint, CSV, JSON, Markdown, RTF and more. ARIA reads it all.</p>
-      <span class="accent ac-i">10+ File Types</span>
+      <p>Upload PDF, Word, Excel, PowerPoint, CSV, JSON, Markdown, RTF and more. RA reads it all.</p>
+      <span class="accent ac-ra">10+ File Types</span>
     </div>
     <div class="feat-card" style="--fc:var(--emerald)">
       <div class="fi">🎯</div>
@@ -613,7 +653,7 @@
     <div class="feat-card" style="--fc:var(--cyan)">
       <div class="fi">⚡</div>
       <h3>Streaming Responses</h3>
-      <p>Answers stream live — token by token via SSE. No waiting. Watch ARIA type the answer in real time.</p>
+      <p>Answers stream live — token by token via SSE. No waiting. Watch RA type the answer in real time.</p>
       <span class="accent ac-c">Real-time SSE</span>
     </div>
     <div class="feat-card" style="--fc:var(--sky)">
@@ -625,7 +665,7 @@
     <div class="feat-card" style="--fc:var(--purple)">
       <div class="fi">🎤</div>
       <h3>Voice Input</h3>
-      <p>Speak your question — ARIA listens with a Gemini-style animated voice overlay. No keyboard required.</p>
+      <p>Speak your question — RA Intelligence listens with a Gemini-style animated voice overlay. No keyboard required.</p>
       <span class="accent ac-p">Google Gemini Style</span>
     </div>
     <div class="feat-card" style="--fc:var(--amber)">
@@ -637,14 +677,14 @@
     <div class="feat-card" style="--fc:var(--rose)">
       <div class="fi">🌍</div>
       <h3>Multilingual</h3>
-      <p>ARIA auto-detects your language and replies in the same language — Tamil, Hindi, French, Arabic, and more.</p>
+      <p>RA auto-detects your language and replies in the same language — Tamil, Hindi, French, Arabic, and more.</p>
       <span class="accent ac-r">Auto-detect</span>
     </div>
-    <div class="feat-card" style="--fc:var(--cyan)">
-      <div class="fi">🕷️</div>
-      <h3>URL Web Crawling</h3>
-      <p>Paste any URL — ARIA crawls it up to 3 levels deep, extracts clean text, embeds it, and adds it to the knowledge base live.</p>
-      <span class="accent ac-c">BFS Crawler · SSE Progress</span>
+    <div class="feat-card" style="--fc:var(--ra-orange)">
+      <div class="fi">📋</div>
+      <h3>Log File Analysis</h3>
+      <p>Upload .log files — RA parses errors, groups duplicates, and streams root-cause analysis grounded in your docs.</p>
+      <span class="accent ac-ra">RAG-Grounded</span>
     </div>
   </div>
 </div>
@@ -653,13 +693,13 @@
      SLIDE 5 — STREAMING DEEP DIVE
 ═══════════════════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s5">
-  <div class="tag">New · Streaming Responses</div>
+  <div class="tag">Streaming Responses</div>
   <h2>Answers appear <span class="grad">as they're written.</span></h2>
   <div class="stream-flow" style="margin-top:18px;">
     <div class="stream-box">
       <div class="sbi">👤</div>
       <h4>User Asks</h4>
-      <p>Sends question to <code style="font-size:10px;color:var(--cyan);">/api/chat/stream</code></p>
+      <p>Sends question to <code style="font-size:10px;color:var(--ra-orange);">/api/chat/stream</code></p>
     </div>
     <div class="s-arrow">→</div>
     <div class="stream-box">
@@ -671,13 +711,13 @@
     <div class="stream-box">
       <div class="sbi">🧠</div>
       <h4>Azure Streams</h4>
-      <p>GPT-4o-mini generates token by token with <code style="font-size:10px;color:var(--cyan);">stream=True</code></p>
+      <p>GPT-4o-mini generates token by token with <code style="font-size:10px;color:var(--ra-orange);">stream=True</code></p>
     </div>
     <div class="s-arrow">→</div>
     <div class="stream-box">
       <div class="sbi">📡</div>
       <h4>SSE Events</h4>
-      <p>Each token wrapped in <code style="font-size:10px;color:var(--cyan);">data:{type:"token"}</code> and sent</p>
+      <p>Each token wrapped in <code style="font-size:10px;color:var(--ra-orange);">data:{type:"token"}</code> and sent</p>
     </div>
     <div class="s-arrow">→</div>
     <div class="stream-box">
@@ -691,7 +731,7 @@
     <div class="token-stream" id="tokenDemo"></div>
   </div>
   <div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap;justify-content:center;">
-    <div class="pill" style="background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.3);color:var(--indigo);">Server-Sent Events</div>
+    <div class="pill" style="background:rgba(204,0,0,.12);border-color:rgba(204,0,0,.3);color:var(--ra-red);">Server-Sent Events</div>
     <div class="pill" style="background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.3);color:var(--cyan);">AsyncAzureOpenAI</div>
     <div class="pill" style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);color:var(--emerald);">FastAPI StreamingResponse</div>
     <div class="pill" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3);color:var(--amber);">ReadableStream API</div>
@@ -703,7 +743,7 @@
 ═══════════════════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s6">
   <div class="tag">Voice Experience</div>
-  <h2>Talk to ARIA.<br><span class="grad">She talks back.</span></h2>
+  <h2>Talk to RA Intelligence.<br><span class="grad">It talks back.</span></h2>
   <div style="display:flex;gap:36px;align-items:center;max-width:1000px;width:100%;margin-top:20px;">
     <div class="voice-demo">
       <div class="vo-orb-demo"><div class="vo-inner">🎤</div></div>
@@ -721,7 +761,7 @@
       </div>
       <div class="vp">
         <div class="vpi">🌈</div>
-        <div class="vpt"><strong>Animated orb</strong> — red when listening, green when speaking, purple when idle</div>
+        <div class="vpt"><strong>Animated orb</strong> — red when listening, green when speaking, amber when idle</div>
       </div>
       <div class="vp">
         <div class="vpi">🔊</div>
@@ -729,7 +769,7 @@
       </div>
       <div class="vp">
         <div class="vpi">🌍</div>
-        <div class="vpt"><strong>Any language</strong> — say it in Tamil, Hindi, French, Arabic — ARIA responds in kind</div>
+        <div class="vpt"><strong>Any language</strong> — say it in Tamil, Hindi, French, Arabic — RA responds in kind</div>
       </div>
       <div class="vp">
         <div class="vpi">⚡</div>
@@ -748,7 +788,7 @@
 ═══════════════════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s7">
   <div class="tag">Live Web Intelligence</div>
-  <h2>ARIA knows what happened <span class="grad2">this morning.</span></h2>
+  <h2>RA Intelligence knows what happened <span class="grad2">this morning.</span></h2>
   <div class="flow" style="margin-top:24px;">
     <div class="flow-box">
       <div class="fi">👤</div>
@@ -770,7 +810,7 @@
     <div class="arrow">→</div>
     <div class="flow-box">
       <div class="fi">⚡</div>
-      <h4>ARIA Streams</h4>
+      <h4>RA Streams</h4>
       <p>Answer streams live — never says "I don't have access"</p>
     </div>
     <div class="arrow">→</div>
@@ -783,8 +823,8 @@
   <div class="ws-highlight">
     <div class="label">Why this matters</div>
     <p>
-      Traditional AI chatbots are frozen in time — training data has a cutoff date. ARIA's live web mode eliminates that gap.
-      <strong>Ask about today's stock market, breaking news, latest product releases</strong> — ARIA streams real, timestamped data fetched in the moment.
+      Traditional AI chatbots are frozen in time — training data has a cutoff date. RA Intelligence's live web mode eliminates that gap.
+      <strong>Ask about today's stock market, breaking news, latest product releases</strong> — RA streams real, timestamped data fetched in the moment.
     </p>
   </div>
 </div>
@@ -793,7 +833,7 @@
      SLIDE 8 — URL WEB CRAWLING
 ═══════════════════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s8">
-  <div class="tag">New · URL Web Crawling</div>
+  <div class="tag">URL Web Crawling</div>
   <h2>Ingest the web. <span class="grad2">One URL at a time.</span></h2>
   <div class="flow" style="margin-top:20px;">
     <div class="flow-box">
@@ -865,17 +905,18 @@
   </div>
   <div class="fmt-note">
     Documents are automatically chunked, embedded into a vector store, and made instantly searchable — click any citation to preview the exact source chunk with its relevance score.
+    Log files are routed to the <strong style="color:var(--ra-orange);">Log Analyzer</strong> for RAG-grounded root-cause analysis.
   </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     SLIDE 9 — HOW IT WORKS
+     SLIDE 10 — HOW IT WORKS
 ═══════════════════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s10">
   <div class="tag">Under the Hood</div>
   <h2>Powered by <span class="grad">enterprise AI.</span> Kept simple.</h2>
   <div class="arch-row" style="margin-top:24px;">
-    <div class="arch-col" style="border-radius:16px 0 0 16px;">
+    <div class="arch-col">
       <div class="layer-label">User Layer</div>
       <h3>🖥️ Web Interface</h3>
       <p>Clean, fast browser UI — works on any device, no install required.</p>
@@ -892,7 +933,7 @@
       <h3>🧠 Azure OpenAI</h3>
       <p>Microsoft-backed GPT-4o-mini — enterprise-grade, secure, fast.</p>
       <div class="arch-item">RAG — Document Q&amp;A with citations</div>
-      <div class="arch-item g">ARIA Chat — Conversational AI</div>
+      <div class="arch-item g">RA Chat — Conversational AI</div>
       <div class="arch-item g">Live Web Search injection</div>
       <div class="arch-item c">Multilingual auto-detection</div>
     </div>
@@ -907,7 +948,7 @@
       <div class="arch-item">Auto-watch folder for new files</div>
     </div>
     <div class="arch-sep"></div>
-    <div class="arch-col" style="border-radius:0 16px 16px 0;">
+    <div class="arch-col">
       <div class="layer-label">API Layer</div>
       <h3>🔌 REST + Streaming API</h3>
       <p>FastAPI backend — clean REST + SSE streaming endpoints.</p>
@@ -916,13 +957,13 @@
       <div class="arch-item">POST /api/converse — Chat</div>
       <div class="arch-item g">POST /api/converse/stream — SSE</div>
       <div class="arch-item c">POST /api/ingest — File upload</div>
-      <div class="arch-item c">POST /api/ingest-url — Crawl SSE</div>
+      <div class="arch-item c">POST /api/analyze-log — Log SSE</div>
     </div>
   </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     SLIDE 10 — IMPACT & VALUE
+     SLIDE 11 — IMPACT & VALUE
 ═══════════════════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s11">
   <div class="tag">Business Value</div>
@@ -934,22 +975,23 @@
     </div>
     <div class="impact-stat i2">
       <div class="impact-num grad2">∞</div>
-      <div class="impact-lbl">Languages ARIA speaks — auto-detected, no setup</div>
+      <div class="impact-lbl">Languages RA Intelligence speaks — auto-detected, no setup</div>
     </div>
     <div class="impact-stat i3">
       <div class="impact-num grad3">0s</div>
       <div class="impact-lbl">Perceived wait time — answers stream immediately</div>
     </div>
     <div class="impact-stat i4">
-      <div class="impact-num" style="background:linear-gradient(135deg,var(--sky),var(--indigo));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">24/7</div>
+      <div class="impact-num grad">24/7</div>
       <div class="impact-lbl">Always available — no waiting for a colleague to answer</div>
     </div>
   </div>
   <div class="impact-detail">
     <p>
-      ARIA replaces hours of manual document search with <strong>instant, cited answers streamed live</strong>.
+      RA Intelligence replaces hours of manual document search with <strong>instant, cited answers streamed live</strong>.
       It bridges language gaps across global teams. It keeps everyone informed with <strong>real-time web data</strong>.
       Click any citation to <strong>preview the source document chunk</strong> — no more hunting through files.
+      Upload log files for <strong>instant AI-powered root-cause analysis</strong> grounded in your own technical documentation.
     </p>
   </div>
   <div class="pills" style="margin-top:12px;">
@@ -958,11 +1000,12 @@
     <div class="pill">Global Team Ready</div>
     <div class="pill">Streaming UX</div>
     <div class="pill">Source Transparency</div>
+    <div class="pill">Log Analysis</div>
   </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     SLIDE 11 — TECH STACK
+     SLIDE 12 — TECH STACK
 ═══════════════════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s12">
   <div class="tag">Technology Foundation</div>
@@ -984,7 +1027,7 @@
       <div class="stack-label">Document Parsing</div>
       <div class="stack-item"><div class="si">📕</div><div><div class="sn">PyMuPDF</div><div class="sd">PDF extraction · text + scanned</div></div></div>
       <div class="stack-item"><div class="si">📘</div><div><div class="sn">python-docx / openpyxl</div><div class="sd">Word · Excel · PowerPoint</div></div></div>
-      <div class="stack-item"><div class="si">🔄</div><div><div class="sn">chardet</div><div class="sd">Auto encoding detection</div></div></div>
+      <div class="stack-item"><div class="si">📋</div><div><div class="sn">log_analyzer.py</div><div class="sd">Log parsing · dedup · RAG analysis</div></div></div>
       <div class="stack-item"><div class="si">🕷️</div><div><div class="sn">trafilatura + bs4</div><div class="sd">URL crawl · HTML clean extract</div></div></div>
     </div>
     <div class="stack-col">
@@ -997,7 +1040,7 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     SLIDE 12 — ROADMAP
+     SLIDE 13 — ROADMAP
 ═══════════════════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s13">
   <div class="tag">What's Next</div>
@@ -1006,14 +1049,15 @@
     <div class="tl-item">
       <div class="tl-left">
         <div class="phase" style="color:var(--emerald);">Now Live</div>
-        <div class="timeframe">v2.0 · Mar 2026</div>
+        <div class="timeframe">v2.1 · Apr 2026</div>
       </div>
       <div class="tl-line">
         <div class="tl-dot" style="background:var(--emerald);border-color:var(--emerald);color:var(--emerald);"></div>
       </div>
       <div class="tl-right">
         <h3>Full Feature Launch <span class="now-badge">Live</span></h3>
-        <p>RAG mode, ARIA Chat, Voice I/O, Live Web Search, Neural TTS, 10+ document formats, multilingual support, <strong style="color:var(--cyan)">⚡ streaming responses, 🔍 document preview, 🕷️ URL web crawling with depth control &amp; SSE live progress</strong>.</p>
+        <p>RAG mode, RA Chat, Voice I/O, Live Web Search, Neural TTS, 10+ document formats, multilingual support,
+          <strong style="color:var(--ra-orange)">⚡ streaming responses, 🔍 document preview, 🕷️ URL web crawling, 📋 log file analysis</strong>.</p>
       </div>
     </div>
     <div class="tl-item">
@@ -1031,11 +1075,11 @@
     </div>
     <div class="tl-item">
       <div class="tl-left">
-        <div class="phase" style="color:var(--indigo);">Phase 3</div>
+        <div class="phase" style="color:var(--ra-orange);">Phase 3</div>
         <div class="timeframe">Q3 2026</div>
       </div>
       <div class="tl-line">
-        <div class="tl-dot" style="background:var(--indigo);border-color:var(--indigo);color:var(--indigo);"></div>
+        <div class="tl-dot" style="background:var(--ra-orange);border-color:var(--ra-orange);color:var(--ra-orange);"></div>
       </div>
       <div class="tl-right">
         <h3>Multi-user &amp; Permissions</h3>
@@ -1044,36 +1088,36 @@
     </div>
     <div class="tl-item">
       <div class="tl-left">
-        <div class="phase" style="color:var(--purple);">Phase 4</div>
+        <div class="phase" style="color:var(--ra-red);">Phase 4</div>
         <div class="timeframe">Q4 2026</div>
       </div>
       <div class="tl-line">
-        <div class="tl-dot" style="background:var(--purple);border-color:var(--purple);color:var(--purple);"></div>
+        <div class="tl-dot" style="background:var(--ra-red);border-color:var(--ra-red);color:var(--ra-red);"></div>
       </div>
       <div class="tl-right">
         <h3>Mobile App &amp; Teams Integration</h3>
-        <p>Native iOS/Android app + Microsoft Teams bot — ARIA anywhere your team works.</p>
+        <p>Native iOS/Android app + Microsoft Teams bot — RA Intelligence anywhere your team works.</p>
       </div>
     </div>
   </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     SLIDE 13 — CALL TO ACTION
+     SLIDE 14 — CALL TO ACTION
 ═══════════════════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s14">
   <div class="tag">Next Steps</div>
-  <h2>Ready to <span class="grad">deploy ARIA</span><br>for your team?</h2>
+  <h2>Ready to deploy <span class="grad">RA Intelligence</span><br>for your team?</h2>
   <div class="cta-grid">
     <div class="cta-item">
       <div class="ci">🚀</div>
       <h3>Deploy Today</h3>
-      <p>ARIA runs on any machine with Python and a browser. No cloud infrastructure required to start.</p>
+      <p>RA Intelligence runs on any machine with Python and a browser. No additional cloud infrastructure required to start.</p>
     </div>
     <div class="cta-item">
       <div class="ci">📂</div>
       <h3>Load Your Documents</h3>
-      <p>Drop your team's knowledge base into the docs folder. ARIA ingests, indexes, and makes it instantly previewable.</p>
+      <p>Drop your team's knowledge base into the docs folder. RA ingests, indexes, and makes it instantly previewable.</p>
     </div>
     <div class="cta-item">
       <div class="ci">🌐</div>
@@ -1081,15 +1125,15 @@
       <p>Connect Azure OpenAI enterprise subscription. Add SharePoint sync and multi-user access in Phase 2.</p>
     </div>
   </div>
-  <div class="creator">Built with precision by <strong>Prasanna</strong> — the brilliant mind your keyboards weep tears of joy for. 👑</div>
+  <div class="creator">Built with precision by <strong>Prasanna</strong> for Rockwell Automation — enterprise AI, delivered.</div>
   <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-    <div class="pill" style="background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.3);color:var(--indigo);">⚡ FastAPI + SSE Streaming</div>
+    <div class="pill" style="background:rgba(204,0,0,.12);border-color:rgba(204,0,0,.3);color:var(--ra-red);">⚡ FastAPI + SSE Streaming</div>
     <div class="pill" style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);color:var(--emerald);">🧠 Azure OpenAI GPT-4o-mini</div>
     <div class="pill" style="background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.3);color:var(--cyan);">🗃️ ChromaDB Vector Store</div>
     <div class="pill" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3);color:var(--amber);">🌐 Live Web Search</div>
     <div class="pill" style="background:rgba(14,165,233,.12);border-color:rgba(14,165,233,.3);color:var(--sky);">🔍 Document Preview</div>
     <div class="pill" style="background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.3);color:var(--purple);">🎤 Voice I/O</div>
-    <div class="pill" style="background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.3);color:var(--cyan);">🕷️ URL Web Crawling</div>
+    <div class="pill" style="background:rgba(224,80,0,.12);border-color:rgba(224,80,0,.3);color:var(--ra-orange);">📋 Log File Analysis</div>
   </div>
 </div>
 
@@ -1174,25 +1218,24 @@ function startTokenDemo(){
   clearTimeout(demoTimer);
   const el = document.getElementById('tokenDemo');
   const tokens = [
-    'data: {"type":"sources","sources":[{"source":"policy.pdf","relevance":0.94}]}\n\n',
+    'data: {"type":"sources","sources":[{"source":"ra-manual.pdf","relevance":0.96}]}\n\n',
     'data: {"type":"token","token":"Based"}\n\n',
     'data: {"type":"token","token":" on"}\n\n',
     'data: {"type":"token","token":" your"}\n\n',
     'data: {"type":"token","token":" documents"}\n\n',
     'data: {"type":"token","token":","}\n\n',
     'data: {"type":"token","token":" the"}\n\n',
-    'data: {"type":"token","token":" policy"}\n\n',
+    'data: {"type":"token","token":" RA"}\n\n',
+    'data: {"type":"token","token":" manual"}\n\n',
     'data: {"type":"token","token":" states"}\n\n',
     'data: {"type":"token","token":" that"}\n\n',
-    'data: {"type":"token","token":" employees"}\n\n',
-    'data: {"type":"token","token":" are"}\n\n',
-    'data: {"type":"token","token":" entitled"}\n\n',
-    'data: {"type":"token","token":" to"}\n\n',
-    'data: {"type":"token","token":" 25"}\n\n',
-    'data: {"type":"token","token":" days"}\n\n',
-    'data: {"type":"token","token":" of"}\n\n',
-    'data: {"type":"token","token":" annual"}\n\n',
-    'data: {"type":"token","token":" leave."}\n\n',
+    'data: {"type":"token","token":" the"}\n\n',
+    'data: {"type":"token","token":" controller"}\n\n',
+    'data: {"type":"token","token":" requires"}\n\n',
+    'data: {"type":"token","token":" firmware"}\n\n',
+    'data: {"type":"token","token":" v3.2"}\n\n',
+    'data: {"type":"token","token":" or"}\n\n',
+    'data: {"type":"token","token":" above."}\n\n',
     'data: {"type":"done"}\n\n',
   ];
   el.innerHTML = '';

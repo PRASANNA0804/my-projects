@@ -3,20 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ARIA · Login</title>
+  <title>RA Intelligence · Login</title>
   <style>
     /* ── CSS Custom Properties ─────────────────────────────── */
     :root {
-      --indigo: #6366f1;
-      --purple: #8b5cf6;
-      --cyan:   #06b6d4;
-      --bg:     #080b14;
-      --card-bg: rgba(14, 18, 32, 0.85);
-      --border:  rgba(255, 255, 255, 0.07);
-      --text:    #e2e8f0;
-      --muted:   #64748b;
-      --error:   #f87171;
-      --success: #34d399;
+      --ra-red:    #CC0000;
+      --ra-dark:   #8B0000;
+      --ra-orange: #E05000;
+      --ra-amber:  #FF8C00;
+      --bg:        #090508;
+      --card-bg:   rgba(16, 8, 8, 0.88);
+      --border:    rgba(204, 0, 0, 0.15);
+      --text:      #f0e6e6;
+      --muted:     #7a5a5a;
+      --error:     #f87171;
+      --success:   #34d399;
     }
 
     /* ── Reset & Base ──────────────────────────────────────── */
@@ -44,7 +45,7 @@
       position: absolute;
       inset: 0;
       background-image:
-        radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+        radial-gradient(circle, rgba(204,0,0,0.07) 1px, transparent 1px);
       background-size: 32px 32px;
       z-index: 1;
       pointer-events: none;
@@ -55,27 +56,28 @@
       position: absolute;
       border-radius: 50%;
       filter: blur(80px);
-      opacity: 0.55;
+      opacity: 0.45;
       will-change: transform;
     }
-    .orb-purple {
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, #7c3aed 0%, #4c1d95 60%, transparent 100%);
+    .orb-red {
+      width: 620px; height: 620px;
+      background: radial-gradient(circle, #CC0000 0%, #6B0000 60%, transparent 100%);
       bottom: -180px; left: -150px;
       animation: floatPurple 22s ease-in-out infinite;
     }
-    .orb-indigo {
+    .orb-dark {
       width: 500px; height: 500px;
-      background: radial-gradient(circle, #4f46e5 0%, #312e81 60%, transparent 100%);
+      background: radial-gradient(circle, #8B1000 0%, #4A0500 60%, transparent 100%);
       top: -160px; right: -120px;
       animation: floatIndigo 25s ease-in-out infinite;
     }
-    .orb-cyan {
+    .orb-orange {
       width: 420px; height: 420px;
-      background: radial-gradient(circle, #0891b2 0%, #164e63 60%, transparent 100%);
+      background: radial-gradient(circle, #E05000 0%, #7A2000 60%, transparent 100%);
       top: 35%; left: 40%;
       transform: translate(-50%, -50%);
       animation: floatCyan 20s ease-in-out infinite;
+      opacity: 0.28;
     }
 
     @keyframes floatPurple {
@@ -111,15 +113,15 @@
       width: 100%;
       max-width: 420px;
       background: var(--card-bg);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
       border: 1px solid var(--border);
       border-radius: 24px;
       padding: 44px 40px 40px;
       box-shadow:
-        0 32px 80px rgba(0,0,0,0.6),
-        0 0 0 1px rgba(255,255,255,0.04),
-        inset 0 1px 0 rgba(255,255,255,0.08);
+        0 32px 80px rgba(0,0,0,0.7),
+        0 0 0 1px rgba(204,0,0,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.06);
       position: relative;
       overflow: hidden;
       animation: cardEntrance 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
@@ -141,12 +143,12 @@
       background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(99, 102, 241, 0.06) 40%,
-        rgba(139, 92, 246, 0.12) 50%,
-        rgba(99, 102, 241, 0.06) 60%,
+        rgba(204, 0, 0, 0.05) 40%,
+        rgba(224, 80, 0, 0.08) 50%,
+        rgba(204, 0, 0, 0.05) 60%,
         transparent 100%
       );
-      animation: scanLine 4s ease-in-out infinite;
+      animation: scanLine 5s ease-in-out infinite;
       pointer-events: none;
     }
     @keyframes scanLine {
@@ -166,52 +168,42 @@
       100% { transform: translateX(0); }
     }
 
-    /* ── ARIA Orb ──────────────────────────────────────────── */
-    .orb-wrap {
+    /* ── RA Logo ───────────────────────────────────────────── */
+    .ra-logo-wrap {
       display: flex;
       justify-content: center;
-      margin-bottom: 22px;
+      margin-bottom: 24px;
     }
-    .aria-orb {
-      position: relative;
-      width: 72px; height: 72px;
+    .ra-logo-svg {
+      display: block;
+      filter: drop-shadow(0 4px 22px rgba(204,0,0,0.75));
+      animation: raFloat 4s ease-in-out infinite;
+      will-change: transform;
     }
-    .aria-orb-ring {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background: conic-gradient(
-        from 0deg,
-        var(--indigo),
-        var(--purple),
-        var(--cyan),
-        var(--indigo)
-      );
-      animation: spinRing 3s linear infinite;
-      padding: 3px;
+    /* Float: only transform — GPU-accelerated, smooth 60fps */
+    @keyframes raFloat {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-6px); }
     }
-    @keyframes spinRing {
-      to { transform: rotate(360deg); }
+    /* Shine sweep: CSS transform replaces janky SMIL <animate> */
+    .ra-shine-l {
+      transform-box: fill-box;
+      animation: raShineL 2.8s linear infinite;
+      animation-delay: 0.8s;
+      will-change: transform;
     }
-    .aria-orb-inner {
-      position: absolute;
-      inset: 4px;
-      border-radius: 50%;
-      background: #0d1020;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      z-index: 1;
+    @keyframes raShineL {
+      0%   { transform: skewX(-15deg) translateX(-120px); }
+      100% { transform: skewX(-15deg) translateX(220px); }
     }
 
     /* ── Title & Tagline ───────────────────────────────────── */
     .title {
       text-align: center;
-      font-size: 2.2rem;
+      font-size: 2.0rem;
       font-weight: 800;
       letter-spacing: -0.5px;
-      background: linear-gradient(135deg, var(--indigo) 0%, var(--purple) 50%, var(--cyan) 100%);
+      background: linear-gradient(135deg, var(--ra-amber) 0%, var(--ra-orange) 40%, var(--ra-red) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -220,11 +212,12 @@
     }
     .tagline {
       text-align: center;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--muted);
       margin-bottom: 32px;
-      line-height: 1.5;
-      font-style: italic;
+      line-height: 1.6;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
     /* ── Error Banner ──────────────────────────────────────── */
@@ -254,9 +247,9 @@
     }
     .field-group label {
       display: block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--muted);
       margin-bottom: 7px;
@@ -264,34 +257,32 @@
       transition: color 0.2s;
     }
     .field-group:focus-within label {
-      color: var(--indigo);
+      color: var(--ra-orange);
     }
     .field-group input {
       width: 100%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(204,0,0,0.18);
       border-radius: 12px;
       padding: 13px 44px 13px 16px;
       font-size: 0.95rem;
       color: var(--text);
       outline: none;
       transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
-      caret-color: var(--indigo);
+      caret-color: var(--ra-orange);
     }
     .field-group input::placeholder {
-      color: rgba(100, 116, 139, 0.55);
+      color: rgba(100, 80, 80, 0.55);
       font-size: 0.88rem;
     }
     .field-group input:focus {
-      border-color: var(--indigo);
-      background: rgba(99, 102, 241, 0.05);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18), 0 0 16px rgba(99, 102, 241, 0.1);
+      border-color: var(--ra-red);
+      background: rgba(204, 0, 0, 0.04);
+      box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.15), 0 0 16px rgba(204, 0, 0, 0.08);
     }
 
-    /* Eye toggle button — sits inside the input wrapper */
-    .input-wrap {
-      position: relative;
-    }
+    /* Eye toggle */
+    .input-wrap { position: relative; }
     .eye-btn {
       position: absolute;
       right: 12px;
@@ -306,7 +297,7 @@
       align-items: center;
       transition: color 0.2s;
     }
-    .eye-btn:hover { color: var(--indigo); }
+    .eye-btn:hover { color: var(--ra-orange); }
     .eye-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
     /* ── Remember Me Toggle ────────────────────────────────── */
@@ -328,7 +319,7 @@
     .toggle-label input[type="checkbox"] { display: none; }
     .toggle-pill {
       width: 38px; height: 22px;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.08);
       border-radius: 99px;
       position: relative;
       transition: background 0.25s;
@@ -344,16 +335,14 @@
       transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s;
     }
     .toggle-label input:checked ~ .toggle-pill {
-      background: var(--indigo);
+      background: var(--ra-red);
     }
     .toggle-label input:checked ~ .toggle-pill::after {
       transform: translateX(16px);
     }
 
     /* Forgot password */
-    .forgot-wrap {
-      position: relative;
-    }
+    .forgot-wrap { position: relative; }
     .forgot-link {
       font-size: 0.8rem;
       color: var(--muted);
@@ -364,13 +353,13 @@
       border: none;
       font-family: inherit;
     }
-    .forgot-link:hover { color: var(--indigo); }
+    .forgot-link:hover { color: var(--ra-orange); }
     .forgot-tooltip {
       position: absolute;
       right: 0;
       bottom: calc(100% + 8px);
-      background: rgba(14, 18, 32, 0.98);
-      border: 1px solid rgba(99, 102, 241, 0.35);
+      background: rgba(16, 5, 5, 0.98);
+      border: 1px solid rgba(204, 0, 0, 0.35);
       border-radius: 10px;
       padding: 10px 14px;
       font-size: 0.78rem;
@@ -387,9 +376,9 @@
       bottom: -5px;
       right: 16px;
       width: 10px; height: 10px;
-      background: rgba(14, 18, 32, 0.98);
-      border-right: 1px solid rgba(99, 102, 241, 0.35);
-      border-bottom: 1px solid rgba(99, 102, 241, 0.35);
+      background: rgba(16, 5, 5, 0.98);
+      border-right: 1px solid rgba(204, 0, 0, 0.35);
+      border-bottom: 1px solid rgba(204, 0, 0, 0.35);
       transform: rotate(45deg);
     }
     .forgot-tooltip.visible { display: block; }
@@ -410,33 +399,29 @@
       cursor: pointer;
       position: relative;
       overflow: hidden;
-      background: linear-gradient(135deg, var(--indigo) 0%, var(--purple) 100%);
+      background: linear-gradient(135deg, var(--ra-orange) 0%, var(--ra-red) 100%);
       color: #fff;
       transition: transform 0.15s, box-shadow 0.25s;
-      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+      box-shadow: 0 4px 20px rgba(204, 0, 0, 0.45);
       margin-bottom: 6px;
     }
     .login-btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 8px 28px rgba(99, 102, 241, 0.55);
+      box-shadow: 0 8px 28px rgba(204, 0, 0, 0.60);
     }
     .login-btn:active { transform: translateY(0); }
 
-    /* Liquid fill sweep on hover */
     .login-btn::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, var(--purple) 0%, var(--cyan) 100%);
+      background: linear-gradient(135deg, var(--ra-amber) 0%, var(--ra-orange) 100%);
       opacity: 0;
       transition: opacity 0.4s ease;
     }
     .login-btn:hover::before { opacity: 1; }
 
-    .login-btn-text {
-      position: relative;
-      z-index: 1;
-    }
+    .login-btn-text { position: relative; z-index: 1; }
 
     /* Spinner state */
     .login-btn.loading {
@@ -476,16 +461,16 @@
       line-height: 1.8;
     }
     .footer code {
-      background: rgba(255,255,255,0.07);
+      background: rgba(204,0,0,0.10);
       border-radius: 4px;
       padding: 1px 5px;
       font-size: 0.72rem;
-      color: var(--cyan);
+      color: var(--ra-amber);
       font-family: 'Courier New', monospace;
     }
     .footer .version {
       font-size: 0.7rem;
-      opacity: 0.6;
+      opacity: 0.55;
       margin-top: 2px;
     }
 
@@ -509,7 +494,7 @@
     #rippleCircle {
       position: fixed;
       border-radius: 50%;
-      background: radial-gradient(circle at center, #1e1b4b 0%, #0d1020 60%, #080b14 100%);
+      background: radial-gradient(circle at center, #1a0505 0%, #0a0302 60%, #090508 100%);
       z-index: 99;
       transform: scale(0);
       pointer-events: none;
@@ -528,24 +513,29 @@
       border-radius: 50%;
       background: conic-gradient(
         from 0deg,
-        var(--indigo),
-        var(--purple),
-        var(--cyan),
-        var(--indigo)
+        var(--ra-red),
+        var(--ra-orange),
+        var(--ra-amber),
+        var(--ra-red)
       );
       animation: spinRing 1.5s linear infinite;
       padding: 4px;
+    }
+    @keyframes spinRing {
+      to { transform: rotate(360deg); }
     }
     .success-orb-inner {
       position: absolute;
       inset: 5px;
       border-radius: 50%;
-      background: #0d1020;
+      background: #0d0203;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 42px;
       z-index: 1;
+    }
+    .success-orb-svg {
+      width: 56px; height: 56px;
     }
 
     .success-message {
@@ -569,14 +559,12 @@
       display: inline-block;
       width: 2px;
       height: 1em;
-      background: var(--indigo);
+      background: var(--ra-orange);
       margin-left: 2px;
       vertical-align: middle;
       animation: blink 0.7s step-end infinite;
     }
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
+    @keyframes blink { 50% { opacity: 0; } }
 
     /* Canvas */
     #particleCanvas {
@@ -589,7 +577,7 @@
     /* ── Responsive ────────────────────────────────────────── */
     @media (max-width: 480px) {
       .card { padding: 36px 24px 32px; }
-      .title { font-size: 1.9rem; }
+      .title { font-size: 1.7rem; }
     }
   </style>
 </head>
@@ -597,9 +585,9 @@
 
 <!-- Background Scene -->
 <div class="scene">
-  <div class="orb orb-purple"></div>
-  <div class="orb orb-indigo"></div>
-  <div class="orb orb-cyan"></div>
+  <div class="orb orb-red"></div>
+  <div class="orb orb-dark"></div>
+  <div class="orb orb-orange"></div>
 </div>
 
 <!-- Particle Canvas (behind overlay) -->
@@ -612,7 +600,27 @@
 <div id="successOverlay">
   <div class="success-orb-wrap">
     <div class="success-orb-ring"></div>
-    <div class="success-orb-inner">🤖</div>
+    <div class="success-orb-inner">
+      <!-- RA logo inside success orb -->
+      <svg class="success-orb-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" aria-label="Rockwell Automation">
+        <defs>
+          <linearGradient id="raGradS" x1="0%" y1="0%" x2="100%" y2="110%">
+            <stop offset="0%" stop-color="#FF8C00"/>
+            <stop offset="30%" stop-color="#D83000"/>
+            <stop offset="100%" stop-color="#CC0000"/>
+          </linearGradient>
+          <linearGradient id="raSheenS" x1="0%" y1="0%" x2="80%" y2="80%">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.38)"/>
+            <stop offset="55%" stop-color="rgba(255,255,255,0)"/>
+          </linearGradient>
+        </defs>
+        <path d="M40 5 L65 12 L75 40 L65 68 L40 75 L15 68 L5 40 L15 12 Z" fill="url(#raGradS)"/>
+        <path d="M40 5 L65 12 L75 40 L65 68 L40 75 L15 68 L5 40 L15 12 Z" fill="url(#raSheenS)"/>
+        <text x="40" y="52" text-anchor="middle"
+          font-family="'Arial Black',Impact,'Helvetica Neue',sans-serif"
+          font-weight="900" font-size="30" fill="white" letter-spacing="-1">RA</text>
+      </svg>
+    </div>
   </div>
   <div class="success-message">
     <div class="typewriter" id="typewriterMain"><span class="cursor-blink"></span></div>
@@ -624,17 +632,40 @@
 <div class="page">
   <div class="card" id="loginCard">
 
-    <!-- ARIA Orb -->
-    <div class="orb-wrap">
-      <div class="aria-orb">
-        <div class="aria-orb-ring"></div>
-        <div class="aria-orb-inner">🤖</div>
-      </div>
+    <!-- RA Logo -->
+    <div class="ra-logo-wrap">
+      <svg class="ra-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="86" height="86" aria-label="Rockwell Automation">
+        <defs>
+          <linearGradient id="raGradL" x1="0%" y1="0%" x2="100%" y2="110%">
+            <stop offset="0%" stop-color="#FF8C00"/>
+            <stop offset="28%" stop-color="#D83000"/>
+            <stop offset="100%" stop-color="#CC0000"/>
+          </linearGradient>
+          <linearGradient id="raSheenL" x1="0%" y1="0%" x2="80%" y2="80%">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.40)"/>
+            <stop offset="55%" stop-color="rgba(255,255,255,0)"/>
+          </linearGradient>
+          <clipPath id="raClipL">
+            <path d="M40 5 L65 12 L75 40 L65 68 L40 75 L15 68 L5 40 L15 12 Z"/>
+          </clipPath>
+        </defs>
+        <!-- Main body -->
+        <path d="M40 5 L65 12 L75 40 L65 68 L40 75 L15 68 L5 40 L15 12 Z" fill="url(#raGradL)"/>
+        <!-- Sheen overlay -->
+        <path d="M40 5 L65 12 L75 40 L65 68 L40 75 L15 68 L5 40 L15 12 Z" fill="url(#raSheenL)"/>
+        <!-- Shine sweep — animated via CSS (60fps GPU) -->
+        <rect class="ra-shine-l" x="0" y="0" width="45" height="80"
+              fill="rgba(255,255,255,0.22)" clip-path="url(#raClipL)"/>
+        <!-- RA lettermark -->
+        <text x="40" y="52" text-anchor="middle"
+          font-family="'Arial Black',Impact,'Helvetica Neue',sans-serif"
+          font-weight="900" font-size="30" fill="white" letter-spacing="-1">RA</text>
+      </svg>
     </div>
 
     <!-- Title -->
-    <h1 class="title">ARIA</h1>
-    <p class="tagline">Only brilliant minds allowed.<br>And you, apparently.</p>
+    <h1 class="title">RA Intelligence</h1>
+    <p class="tagline">Rockwell Automation · Powered by Azure AI</p>
 
     <!-- Error Banner -->
     <div class="error-banner" id="errorBanner"></div>
@@ -685,14 +716,14 @@
         <div class="forgot-wrap">
           <button type="button" class="forgot-link" id="forgotBtn">Forgot password?</button>
           <div class="forgot-tooltip" id="forgotTooltip">
-            We told you to write it down 😔<br>Hint: <strong>aria2026</strong>
+            Contact your system administrator.<br>Hint: <strong>aria2026</strong>
           </div>
         </div>
       </div>
 
       <!-- Submit -->
       <button type="submit" class="login-btn" id="loginBtn">
-        <span class="login-btn-text">Enter the ARIA Zone →</span>
+        <span class="login-btn-text">Access RA Intelligence →</span>
       </button>
 
     </form>
@@ -701,7 +732,7 @@
   <!-- Footer -->
   <div class="footer">
     <div>Demo password: <code>aria2026</code></div>
-    <div class="version">ARIA v2.0 · Built by Prasanna 👑</div>
+    <div class="version">RA Intelligence v2.0 · Rockwell Automation</div>
   </div>
 </div>
 
@@ -761,9 +792,8 @@
     tooltipOpen = !tooltipOpen;
     forgotTooltip.classList.toggle('visible', tooltipOpen);
     if (tooltipOpen) {
-      // Re-trigger animation
       forgotTooltip.style.animation = 'none';
-      forgotTooltip.offsetHeight; // reflow
+      forgotTooltip.offsetHeight;
       forgotTooltip.style.animation = '';
     }
   });
@@ -777,10 +807,10 @@
   /* ── Error messages by attempt ─────────────────────────── */
   function getErrorMessage(attempt) {
     switch (attempt) {
-      case 1:  return 'Nope. Not even close. Try again, genius 🧐';
-      case 2:  return "Still wrong. We're beginning to question your intelligence 🤔";
-      case 3:  return 'At this point just guess. We believe in you. (Hint: aria2026) 🙏';
-      default: return '...Have you tried turning your brain off and on again? 🔄';
+      case 1:  return 'Invalid credentials. Please try again.';
+      case 2:  return 'Authentication failed. Verify your username and password.';
+      case 3:  return 'Multiple failed attempts. Hint: aria2026';
+      default: return 'Access denied. Please contact your administrator.';
     }
   }
 
@@ -788,7 +818,6 @@
   function showError(msg) {
     errorBanner.textContent = msg;
     errorBanner.classList.remove('visible');
-    // force reflow for re-animation
     void errorBanner.offsetWidth;
     errorBanner.classList.add('visible');
 
@@ -821,7 +850,7 @@
   }
 
   /* ── Particle System ───────────────────────────────────── */
-  const COLORS = ['#6366f1', '#8b5cf6', '#06b6d4', '#ffffff', '#a78bfa', '#67e8f9'];
+  const COLORS = ['#CC0000', '#E05000', '#FF8C00', '#ffffff', '#FF6B35', '#FFB347'];
   let particles = [];
   let animFrameId = null;
 
@@ -880,15 +909,13 @@
   function runSuccessSequence(username) {
     const isVip    = username.toLowerCase() === 'prasanna';
     const mainMsg  = isVip
-      ? 'Oh! THE Prasanna?! The living legend! 👑 Rolling out the digital red carpet...'
-      : "Identity confirmed. You're either authorized or very lucky. Either way, ARIA has been expecting you.";
-    const subMsg   = 'Loading your universe...';
+      ? 'Welcome back, Prasanna. Access granted to RA Intelligence. Initializing your workspace...'
+      : 'Identity verified. Welcome to RA Intelligence — your Rockwell Automation AI platform.';
+    const subMsg   = 'Loading your environment...';
 
-    /* Step 1: Morph button to spinner (instant CSS class) */
     loginBtn.classList.add('loading');
 
     setTimeout(function () {
-      /* Step 2: Ripple from button centre */
       const btnRect = loginBtn.getBoundingClientRect();
       const originX = btnRect.left + btnRect.width  / 2;
       const originY = btnRect.top  + btnRect.height / 2;
@@ -906,26 +933,21 @@
       const scaleTo = maxDim / 60;
       rippleCircle.style.transform = `scale(${scaleTo})`;
 
-      /* Step 3: Show success overlay + particles after ripple covers screen */
       setTimeout(function () {
         successOverlay.style.opacity = '1';
         successOverlay.classList.add('active');
         spawnParticles();
 
-        /* Typewrite main message */
         typewrite(typewriterMain, mainMsg, 28, function () {
-          /* After main message → sub message */
           setTimeout(function () {
             typewrite(typewriterSub, subMsg, 40, null);
           }, 400);
         });
 
-        /* Step 4: Redirect after 3.2s total from sequence start */
       }, 600);
 
     }, 300);
 
-    /* Redirect at 3.2s from start */
     setTimeout(function () {
       sessionStorage.setItem('aria_auth', JSON.stringify({
         user: username,
@@ -944,12 +966,11 @@
     const CORRECT  = 'aria2026';
 
     if (password === CORRECT) {
-      /* Correct password — lock form and run sequence */
       usernameInput.disabled = true;
       passwordInput.disabled = true;
       forgotBtn.disabled = true;
       errorBanner.classList.remove('visible');
-      runSuccessSequence(username || 'stranger');
+      runSuccessSequence(username || 'User');
     } else {
       attempts++;
       showError(getErrorMessage(attempts));

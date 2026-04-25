@@ -28,6 +28,7 @@ from openai import AsyncAzureOpenAI
 from agent    import get_agent, get_chat_agent
 from ingest   import ingest_document, VECTOR_DB_PATH, COLLECTION_NAME
 from document_loader import SUPPORTED_EXTENSIONS, is_supported
+from log_analyzer import is_log_file, analyze_log_stream
 
 app = FastAPI(
     title      ="RAG Agent API — Azure OpenAI",
@@ -286,6 +287,48 @@ async def ingest_url_endpoint(req: IngestUrlRequest):
         generate(),
         media_type = "text/event-stream",
         headers    = {"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@app.post("/api/analyze-log", tags=["rag"])
+async def analyze_log_endpoint(file: UploadFile = File(...)):
+    """Receive a log file, parse errors/exceptions, retrieve relevant context from
+    the vector store, and stream SSE events with LLM root-cause analysis grounded
+    exclusively in the uploaded documentation — not general knowledge."""
+    filename      = file.filename or "upload.log"
+    content_bytes = await file.read()
+
+    try:
+        import chardet
+        enc = str(chardet.detect(content_bytes).get("encoding") or "utf-8")
+    except ImportError:
+        enc = "utf-8"
+    content = content_bytes.decode(enc, errors="replace")
+
+    if not is_log_file(filename, content[:4096]):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "File does not appear to be a log file. "
+                "Use a .log extension or ensure the file contains log-level keywords "
+                "(ERROR, SEVERE, EXCEPTION, FATAL, CRITICAL, WARNING)."
+            ),
+        )
+
+    client = _get_async_client()
+
+    async def generate():
+        try:
+            async for event in analyze_log_stream(content, filename, client):
+                yield f"data: {json.dumps(event)}\n\n"
+        except Exception as exc:
+            traceback.print_exc()
+            yield f"data: {json.dumps({'type': 'error', 'message': str(exc)})}\n\n"
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
 
