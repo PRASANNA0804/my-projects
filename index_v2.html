@@ -1920,7 +1920,7 @@ async function sendMsg(){
     try{
       const res=await fetch(`${API}/chat/stream`,{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({question:q,top_k:topK})
+        body:JSON.stringify({question:q,top_k:topK,history:histSnap.slice(-20)})
       });
       if(!res.ok) throw new Error('HTTP '+res.status);
       const reader=res.body.getReader(), dec=new TextDecoder();

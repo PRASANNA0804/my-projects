@@ -51,6 +51,7 @@ app.add_middleware(
 class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=4000)
     top_k   : int = Field(default=5, ge=1, le=20)
+    history : List[dict] = Field(default_factory=list)
 
 class SourceChunk(BaseModel):
     source    : str
@@ -391,11 +392,24 @@ async def chat_stream(req: ChatRequest):
             context  = format_context(chunks)
             user_msg = RAG_USER_TEMPLATE.format(context=context, question=req.question)
 
+            from typing import cast
+            from openai.types.chat import ChatCompletionMessageParam
+            history = cast(List[ChatCompletionMessageParam], [
+                {"role": m["role"], "content": m["content"]}
+                for m in req.history
+                if m.get("role") in ("user", "assistant") and m.get("content")
+            ])
+            messages: list[ChatCompletionMessageParam] = [
+                {"role": "system", "content": RAG_SYSTEM_PROMPT}
+            ]
+            if history:
+                messages.extend(history[-20:])
+            messages.append({"role": "user", "content": user_msg})
+
             stream = await client.chat.completions.create(
                 model=AZURE_DEPLOYMENT, temperature=LLM_TEMPERATURE,
                 max_tokens=LLM_MAX_TOKENS, stream=True,
-                messages=[{"role":"system","content":RAG_SYSTEM_PROMPT},
-                          {"role":"user",  "content":user_msg}],
+                messages=messages,
             )
             async for chunk in stream:
                 if not chunk.choices:
